@@ -15,15 +15,17 @@ Un juego de repaso con el formato de *¿Quién quiere ser millonario?* para el t
 ## Cómo se juega
 
 1. Abre `index.html` y escribe los nombres de los equipos.
-2. Elige qué tan larga es la escalera: 15 preguntas (el formato original), 10 (la recomendada para 30 a 40 minutos) o 7. Elige también el tiempo por pregunta.
-3. Los equipos pasan por turnos. Eligen una opción y el moderador confirma con “¿Es su última palabra?”. Si fallan, se quedan con el último nivel seguro. También pueden plantarse y llevarse lo que llevan.
+2. Elige qué tan larga es la escala: 15 preguntas (el formato original), 10 (la recomendada para 30 a 40 minutos) o 7. Elige también el tiempo por pregunta.
+3. Los equipos pasan por turnos. Eligen una opción y el moderador confirma con “¿Es su última palabra?”. En lugar de dinero suben por la **escala sexual** 🌡️: 👀 Contacto visual, 😏 Sonrisa coqueta, ☕ Primera cita, 🤝 De la manita, 💋 Primer beso, 🔥 Faje intenso, ✅ Consentimiento, 🛡️ Con condón, 🎆 Clímax académico… hasta 👑 **SEXPERTO**. Cada escalón da puntos. Si fallan, se quedan en el último nivel seguro (o en la friendzone 🙈). También pueden plantarse.
 4. Cada equipo tiene estos comodines: 50:50, llamada a alguien de otro equipo, ayuda del público (el grupo vota a mano alzada) y cambio de pregunta.
-5. **¡Robo!** Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla. El primero que levante la mano elige entre las opciones que quedan y, si acierta, gana un bono de la mitad del valor de esa pregunta.
-6. Arriba siempre se ve el marcador de todos los equipos, cada uno con su avatar. Al terminar aparece la tabla de posiciones (dinero de la escalera más bonos de robo, con empates incluidos) y se le da su premio al equipo que gane.
+5. **¡Robo!** Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla. El primero que levante la mano elige entre las opciones que quedan y, si acierta, gana un bono de la mitad de los puntos de esa pregunta.
+6. Arriba siempre se ve el marcador de todos los equipos, cada uno con su avatar de doble sentido (🍆 🍑 🌶️ 🍒 🌮 🍌 🥥 💦). Al terminar aparece la tabla de posiciones (puntos de la escala más bonos de robo, con empates incluidos) y se le da su premio al equipo que gane.
 
 Los comodines de llamada y público se abren en un panel al lado de la pregunta para que las opciones sigan visibles. En celular el panel aparece arriba de la pregunta.
 
-El juego tiene **música de fondo épica y original**, generada por el navegador al estilo de un tráiler: tambores graves, cuerdas en ostinato, metales, coro, reverberación y crescendos. Se intensifica con la dificultad: en las preguntas fáciles es más tranquila, en las intermedias entran el ritmo de tambores y los metales, y en las difíciles se vuelve más rápida, con redobles e impactos. También acelera un poco en cada escalón. Durante la revelación de la respuesta la música baja de volumen.
+Para que no se repitan patrones, **las opciones se revuelven cada vez que sale una pregunta** (la letra correcta cambia en cada partida) y las preguntas se eligen al azar sin repetirse en la misma computadora hasta agotar el banco. Por eso las letras de la guía en PDF pueden no coincidir con las del juego.
+
+El juego tiene **música de fondo original estilo EDM de cuenta regresiva**, en tres pistas que se repiten sin cortes: en las preguntas fáciles suena una intro tranquila (120 BPM), en las intermedias entra el bombo y las palmas (128 BPM) y en las difíciles viene el drop con melodía, redobles y platillos (138 BPM). Al cambiar de dificultad hace un fundido, y durante la revelación de la respuesta baja de volumen. Las pistas se generan con `herramientas/musica.py` y `build.py` las mete dentro de `index.html`.
 
 Atajos de teclado para el moderador: las teclas **A** a **D** eligen una opción, **Enter** confirma la última palabra, **Esc** la cancela, **M** silencia los efectos y **N** apaga o prende la música.
 

@@ -18,6 +18,12 @@ for n, (nivel, tema, preg, ops, exp, src) in enumerate(Q, 1):
 
 tpl = open("plantilla.html", encoding="utf-8").read()
 out = tpl.replace("/*__PREGUNTAS__*/[]", json.dumps(data, ensure_ascii=False, indent=0))
+# música: pistas WAV de herramientas/musica/ (se generan con musica.py si no existen)
+import os, base64, subprocess
+if not all(os.path.exists(f"musica/nivel{n}.wav") for n in (1, 2, 3)):
+    subprocess.run([sys.executable, "musica.py"], check=True)
+mus = {n: base64.b64encode(open(f"musica/nivel{n}.wav", "rb").read()).decode() for n in (1, 2, 3)}
+out = out.replace("/*__MUSICA__*/{}", json.dumps({str(k): v for k, v in mus.items()}))
 open("../index.html", "w", encoding="utf-8").write(out)
 
 # ---------- guía PDF (HTML para imprimir) ----------
@@ -72,7 +78,7 @@ table{{border-collapse:collapse;width:100%;font-size:10pt}}td,th{{border:1px sol
 <div class="meta"><div><b>Equipo:</b></div><div><b>Integrantes:</b></div><div><b>Profesor(a):</b></div><div><b>Fecha:</b></div></div></div>
 
 <h2 class="sec">Contenido</h2>
-<p>La guía reúne {len(data)} preguntas de opción múltiple ({cnt[1]} fáciles, {cnt[2]} intermedias y {cnt[3]} difíciles), cada una con su respuesta correcta, una breve explicación y la fuente del curso de donde se obtuvo. Es la base que alimenta el juego: las preguntas fáciles corresponden a la parte baja de la escalera de premios y las difíciles a la parte alta.</p>
+<p>La guía reúne {len(data)} preguntas de opción múltiple ({cnt[1]} fáciles, {cnt[2]} intermedias y {cnt[3]} difíciles), cada una con su respuesta correcta, una breve explicación y la fuente del curso de donde se obtuvo. Es la base que alimenta el juego: las preguntas fáciles corresponden a la parte baja de la “escala sexual” del juego y las difíciles a la parte alta. En el juego el orden de las opciones se revuelve cada vez que sale una pregunta, así que la letra de la respuesta puede no coincidir con la de esta guía.</p>
 <table><tr><th>Tema</th><th>Preguntas</th></tr>{"".join(f"<tr><td>{e(t)}</td><td>{n}</td></tr>" for t, n in temas.items())}</table>
 <h2 class="sec">Materiales de clase utilizados</h2>
 <ul style="columns:1">{"".join(f"<li>• {e(f)}</li>" for f in fuentes)}</ul>
