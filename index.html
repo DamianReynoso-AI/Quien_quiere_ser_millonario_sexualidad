@@ -83,7 +83,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   font-size:clamp(22px,2.4vw,34px);font-weight:600;line-height:1.3;
   background:linear-gradient(180deg,#1f1570,#0c0838);border:3px solid var(--optb);
   clip-path:polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%)}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;overflow-x:clip}
 .opt{position:relative;display:flex;align-items:center;gap:14px;text-align:left;min-height:78px;padding:12px 46px;
   font-size:clamp(17px,1.65vw,24px);line-height:1.25;background:linear-gradient(180deg,#1b1366,#0b0736);border:0;
   clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);transition:filter .15s,background .2s}
@@ -120,6 +120,42 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rung.cur{background:linear-gradient(90deg,#ffb44a,var(--sel));color:#1d0c00}
 .rung.cur .n{color:#1d0c00}
 .lad-h{order:99;text-align:center;color:var(--muted);font-size:14px;margin-bottom:4px}
+
+/* ---------- animaciones ---------- */
+.screen:not(.hidden){animation:fadeIn .45s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.qbox.enter{animation:qIn .55s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes qIn{from{opacity:0;transform:scale(.8) translateY(-16px)}}
+.opts.enter .opt:not(.ok):not(.bad):not(.sel){animation-name:optInL;animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.9,.3,1.15);animation-fill-mode:both}
+.opts.enter .opt:nth-child(even):not(.ok):not(.bad):not(.sel){animation-name:optInR}
+.opts.enter .opt:nth-child(1){animation-delay:.3s}.opts.enter .opt:nth-child(2){animation-delay:.42s}
+.opts.enter .opt:nth-child(3){animation-delay:.54s}.opts.enter .opt:nth-child(4){animation-delay:.66s}
+@keyframes optInL{from{opacity:0;transform:translateX(-60px)}}
+@keyframes optInR{from{opacity:0;transform:translateX(60px)}}
+.opt.sel{animation:selGlow .8s ease-in-out infinite alternate}
+@keyframes selGlow{to{filter:brightness(1.3)}}
+.opt.bad{animation:shake .5s}
+.opt:not(:disabled):active{transform:scale(.97)}
+.rung.cur{animation:glow 1.3s ease-in-out infinite alternate}
+.rung.cur.sube{animation:rungIn .7s cubic-bezier(.2,.9,.3,1.4),glow 1.3s .7s ease-in-out infinite alternate}
+@keyframes rungIn{0%{transform:translateY(26px) scale(.7);opacity:.2}100%{transform:none;opacity:1}}
+@keyframes glow{from{box-shadow:0 0 4px rgba(255,180,74,.4)}to{box-shadow:0 0 22px rgba(255,180,74,.95)}}
+.lifebtn{transition:transform .15s}
+.lifebtn:not(.used):hover{transform:scale(1.08)}
+#overlay:not(.hidden) .modal{animation:modalIn .45s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes modalIn{from{opacity:0;transform:scale(.7) translateY(40px)}}
+.modal .verdict{animation:verdictIn .6s cubic-bezier(.2,.9,.3,1.5) both}
+@keyframes verdictIn{0%{transform:scale(2.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.rank{animation:rankIn .5s cubic-bezier(.2,.9,.3,1.2) both}
+.rank:nth-child(2){animation-delay:.12s}.rank:nth-child(3){animation-delay:.24s}.rank:nth-child(4){animation-delay:.36s}
+.rank:nth-child(5){animation-delay:.48s}.rank:nth-child(6){animation-delay:.6s}.rank:nth-child(n+7){animation-delay:.72s}
+@keyframes rankIn{from{opacity:0;transform:translateY(40px) scale(.95)}}
+.rank.p1{box-shadow:0 0 0 2px var(--gold),0 0 30px rgba(246,196,69,.35)}
+.trophy{display:inline-block;animation:flota 1.6s ease-in-out infinite alternate}
+.trophy.crown{animation:corona 1s cubic-bezier(.2,.9,.3,1.4) both,flota 1.6s 1s ease-in-out infinite alternate;filter:drop-shadow(0 0 24px rgba(246,196,69,.8))}
+@keyframes flota{to{transform:translateY(-10px) rotate(-5deg) scale(1.06)}}
+@keyframes corona{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important}}
 
 /* ---------- modales ---------- */
 .overlay{position:fixed;inset:0;background:rgba(3,1,20,.78);display:grid;place-items:center;z-index:20;padding:16px}
@@ -967,10 +1003,10 @@ const PREGUNTAS = [
 "tema": "Cerebro y sexo",
 "pregunta": "¿Qué propone la ‘hipótesis del mosaico’ de Daphna Joel y colaboradores?",
 "opciones": [
-"Que el cerebro es femenino por defecto y la testosterona lo masculiniza",
+"Que el cerebro de las mujeres es más pequeño y por eso menos capaz",
 "Que cada cerebro combina de forma única rasgos más comunes en mujeres y en hombres",
-"Que hay dos tipos de cerebro, masculino y femenino, con muy pocas excepciones individuales",
-"Que el sexo no produce diferencias medibles en la estructura cerebral"
+"Que hay dos tipos de cerebro, masculino y femenino, con muy pocas excepciones",
+"Que el cerebro cambia de sexo en cada ciclo menstrual"
 ],
 "c": 1,
 "explicacion": "La mayoría de los cerebros son ‘mosaico’; el modelo antiguo de masculinización irreversible por testosterona fue reemplazado.",
@@ -982,10 +1018,10 @@ const PREGUNTAS = [
 "tema": "Cerebro y sexo",
 "pregunta": "En el estudio de resonancia magnética de Joel (2015), ¿qué porcentaje de cerebros eran ‘internamente consistentes’ (todos sus rasgos en el extremo masculino o femenino)?",
 "opciones": [
-"Entre 0% y 8%",
-"Entre 23% y 53%",
-"Entre 60% y 70%",
-"Alrededor del 80%"
+"Entre 0% y 8% (muy pocos)",
+"Alrededor del 50%",
+"Alrededor del 90%",
+"El 100%: todos los cerebros lo eran"
 ],
 "c": 0,
 "explicacion": "Los cerebros consistentes fueron raros (0–8%), mientras que los cerebros mosaico fueron mucho más frecuentes (23–53%).",
@@ -998,7 +1034,7 @@ const PREGUNTAS = [
 "pregunta": "Según Swaab y colegas, ¿por qué el cerebro NO es un órgano sexualmente dimórfico, a diferencia de las gónadas?",
 "opciones": [
 "Las hormonas sexuales no tienen receptores en el tejido cerebral",
-"Las diferencias entre sexos solo aparecen a partir de la pubertad y luego desaparecen",
+"Porque el tamaño del cerebro depende solo de la estatura",
 "Las diferencias entre grupos son pequeñas y hay gran solapamiento entre sexos",
 "Hombres y mujeres tienen estructuras cerebrales exactamente iguales"
 ],
@@ -1012,9 +1048,9 @@ const PREGUNTAS = [
 "tema": "Cerebro y sexo",
 "pregunta": "Según Joel, Garcia-Falgueras y Swaab, con la estructura cerebral se puede predecir la categoría de sexo de una persona con una precisión aproximada de…",
 "opciones": [
-"Alrededor del 30%",
-"Alrededor del 65%",
-"Alrededor del 50%",
+"El 100%, sin margen de error",
+"Menos del 5%",
+"Alrededor del 50%, como lanzar una moneda",
 "Alrededor del 80%"
 ],
 "c": 3,
@@ -1042,9 +1078,9 @@ const PREGUNTAS = [
 "tema": "Psicobiología",
 "pregunta": "El ‘efecto fraternal del orden de nacimiento’ indica que la probabilidad de orientación homosexual en hombres aumenta con…",
 "opciones": [
-"El número total de hermanos, sin importar el sexo",
+"La edad de la madre al embarazarse",
 "El número de hermanas mayores",
-"El número de hermanos varones menores",
+"El signo zodiacal del bebé",
 "El número de hermanos varones mayores"
 ],
 "c": 3,
@@ -1074,8 +1110,8 @@ const PREGUNTAS = [
 "opciones": [
 "Con la identidad de género, no con la orientación sexual",
 "Con la orientación sexual, no con la identidad de género",
-"Con el deseo sexual y la frecuencia de la actividad sexual",
-"Con la producción de testosterona durante la pubertad"
+"Con la memoria y el aprendizaje de idiomas",
+"Con el control de la temperatura corporal"
 ],
 "c": 0,
 "explicacion": "Estudios post mortem relacionan el BST con la identidad de género; es una de las estructuras estudiadas en personas trans.",
@@ -1088,8 +1124,8 @@ const PREGUNTAS = [
 "pregunta": "¿Qué región del cromosoma X asociaron Hamer y colaboradores (1993) con la homosexualidad masculina?",
 "opciones": [
 "Xq28",
-"Xq21",
-"Yq11",
+"El ADN de las mitocondrias",
+"El cromosoma 21 (el de la trisomía)",
 "Xp11"
 ],
 "c": 0,
@@ -1104,8 +1140,8 @@ const PREGUNTAS = [
 "opciones": [
 "SOX9",
 "SRY",
-"DAX1",
-"WNT4"
+"BRCA1 (relacionado con el cáncer de mama)",
+"FOXP2 (relacionado con el lenguaje)"
 ],
 "c": 1,
 "explicacion": "A partir de una gónada bipotencial, el SRY favorece el desarrollo de testículos. También existen genes feminizantes que deben activarse.",
@@ -1117,7 +1153,7 @@ const PREGUNTAS = [
 "tema": "Espectro sexual",
 "pregunta": "En el artículo de Golombek, ¿qué proponía Aristóteles sobre la determinación del sexo?",
 "opciones": [
-"Que el lado del útero donde se gestaba determinaba el sexo de la cría",
+"Que lo decidían los dioses del Olimpo por sorteo",
 "Que la temperatura del vientre materno determinaba el sexo de la cría",
 "Que la fase de la luna durante la concepción definía el sexo de la cría",
 "Que el calor del macho durante la cópula determinaba el sexo de la cría"
@@ -1135,7 +1171,7 @@ const PREGUNTAS = [
 "Hembras XX y machos XY",
 "Hembras ZZ y machos ZW",
 "Hembras ZW y machos ZZ",
-"Hembras XX y machos X0"
+"Las aves no tienen cromosomas sexuales"
 ],
 "c": 2,
 "explicacion": "Es al revés que en mamíferos: en aves el sexo con cromosomas diferentes es la hembra.",
@@ -1192,10 +1228,10 @@ const PREGUNTAS = [
 "tema": "Espectro sexual",
 "pregunta": "Según Golombek, ¿aproximadamente cuántas personas en el mundo presentan estadíos ‘intermedios’ del espectro sexual?",
 "opciones": [
-"Unos 1.5 millones",
+"Unos 4,000 millones (más de la mitad)",
 "Unos 150 millones",
-"Unos 500 millones",
-"Unos 15 millones"
+"Unos 15 millones",
+"Unas 150 personas en todo el mundo"
 ],
 "c": 1,
 "explicacion": "No es raro. En muchos casos se ha procedido a ‘corregir’ quirúrgicamente estas variaciones, algo que CONAPRED y la CIDH señalan como violencia si no hay consentimiento.",
@@ -1209,7 +1245,7 @@ const PREGUNTAS = [
 "opciones": [
 "William Masters y Virginia Johnson",
 "Sigmund Freud y Carl Jung",
-"Alfred Kinsey y Wardell Pomeroy",
+"Charles Darwin y Alfred Wallace",
 "John Money y Anke Ehrhardt"
 ],
 "c": 3,
@@ -1222,7 +1258,7 @@ const PREGUNTAS = [
 "tema": "Harvey Milk",
 "pregunta": "¿Qué buscaba la Proposición 6 (‘Iniciativa Briggs’) de California, contra la que Harvey Milk hizo campaña en 1978?",
 "opciones": [
-"Prohibir que personas gais adoptaran o tuvieran la custodia de menores",
+"Declarar el Día de Harvey Milk como feriado estatal",
 "Prohibir que personas gais y lesbianas fueran docentes en escuelas públicas",
 "Despenalizar las relaciones homosexuales entre adultos en California",
 "Prohibir el matrimonio entre personas del mismo sexo en California"
@@ -1237,10 +1273,10 @@ const PREGUNTAS = [
 "tema": "Harvey Milk",
 "pregunta": "¿Qué reconocimiento recibió Harvey Milk de manera póstuma en 2009?",
 "opciones": [
-"La Medalla Nacional de Humanidades, de manos de Jimmy Carter",
+"Un Óscar honorario por su trayectoria",
 "La Medalla de Oro del Congreso, de manos de Bill Clinton",
 "La Medalla Presidencial de la Libertad, de manos de Barack Obama",
-"La Medalla Presidencial de la Libertad, de manos de Bill Clinton"
+"El Premio Nobel de la Paz"
 ],
 "c": 2,
 "explicacion": "Ese mismo año Sean Penn ganó el Óscar por interpretarlo en la película ‘Milk’ (2008). Su frase célebre: ‘Hay que darles esperanza’.",
@@ -1253,8 +1289,8 @@ const PREGUNTAS = [
 "pregunta": "El informe 2024 del UNFPA conmemora 30 años de la Conferencia de El Cairo (CIPD). ¿Qué dato alarmante señala?",
 "opciones": [
 "Unas 800 mujeres mueren cada día al dar a luz, cifra sin cambios desde 2016",
-"La mortalidad materna se redujo a la mitad en todos los países desde 2016",
-"Unas 8,000 mujeres mueren cada día al dar a luz, sobre todo en Europa",
+"La mortalidad materna ya desapareció en el mundo",
+"Solo mueren mujeres al dar a luz en Europa",
 "Unas 80 mujeres mueren cada día al dar a luz, la cifra más baja registrada"
 ],
 "c": 0,
@@ -1267,9 +1303,9 @@ const PREGUNTAS = [
 "tema": "Educación sexual",
 "pregunta": "Durante el confinamiento de 2020, el Centro de Respuesta a Incidentes Cibernéticos de la Guardia Nacional reportó que el consumo de pornografía infantil en México…",
 "opciones": [
-"Aumentó 29% en marzo y abril",
-"Aumentó 24% en marzo y abril",
-"Aumentó 40% en marzo y abril",
+"Aumentó 5% en marzo y abril",
+"Bajó casi a cero por el confinamiento",
+"Se mantuvo igual que en 2019",
 "Aumentó 73% en marzo y abril"
 ],
 "c": 3,
@@ -1313,13 +1349,73 @@ const PREGUNTAS = [
 "pregunta": "Según el video de AJ+ Español, ¿en qué año salió a las calles la primera marcha LGBT en México?",
 "opciones": [
 "1978",
-"1985",
-"1969",
-"1971"
+"1999",
+"2010",
+"1985"
 ],
 "c": 0,
 "explicacion": "El 26 de julio de 1978 un contingente LGBT marchó por primera vez en la Ciudad de México; la primera Marcha del Orgullo como tal fue en junio de 1979. Ese 1978 Harvey Milk ejercía su cargo en San Francisco.",
 "fuente": "Videos de clase: TV UNAM / AJ+ Español (historia LGBTI+)"
+},
+{
+"id": 69,
+"nivel": 1,
+"tema": "Machosfera",
+"pregunta": "En la ‘machosfera’, ¿qué significa ‘tomar la píldora roja’ (red pill)?",
+"opciones": [
+"Dejar las redes sociales para cuidar la salud mental",
+"Creer que ‘despertaste’ a la supuesta verdad de que la sociedad favorece a las mujeres y oprime a los hombres",
+"Empezar un tratamiento hormonal para aumentar la testosterona",
+"Comprometerse a tratar a las mujeres con igualdad y respeto"
+],
+"c": 1,
+"explicacion": "La metáfora viene de la película Matrix. En la machosfera se usa para presentar el resentimiento contra las mujeres y el feminismo como si fuera un ‘despertar’.",
+"fuente": "Video de clase: BBC Mundo, Los 'mesías' de la machosfera"
+},
+{
+"id": 70,
+"nivel": 2,
+"tema": "Machosfera",
+"pregunta": "Influencers de la machosfera como Andrew Tate difunden la idea de que la mujer debe obedecer a su pareja y ‘pertenecerle’. Desde la perspectiva de género, ese discurso es…",
+"opciones": [
+"Sexista: presenta a las mujeres como inferiores y subordinadas a los hombres",
+"Científico: se basa en evidencia biológica comprobada",
+"Feminista: busca la igualdad de derechos entre hombres y mujeres",
+"Neutral: es solo una opinión personal sin efectos sociales"
+],
+"c": 0,
+"explicacion": "La perspectiva de género permite ver que estos discursos naturalizan la desigualdad y la violencia. El video de BBC Mundo muestra cómo este contenido se vuelve un negocio que monetiza la división de género.",
+"fuente": "Video de clase: BBC Mundo, Los 'mesías' de la machosfera"
+},
+{
+"id": 71,
+"nivel": 2,
+"tema": "Machosfera",
+"pregunta": "Streamers como ‘Clavicular’ popularizaron el ‘looksmaxxing’ en redes. ¿En qué consiste?",
+"opciones": [
+"En un movimiento que critica los estereotipos de belleza en los hombres",
+"En una técnica de meditación para manejar la ansiedad y el estrés",
+"En intentar ‘maximizar’ el atractivo físico, a veces con prácticas riesgosas, porque se cree que el valor de un hombre depende de su físico",
+"En una rutina de lectura para ‘maximizar’ el conocimiento antes de un examen"
+],
+"c": 2,
+"explicacion": "Incluye desde rutinas de ejercicio hasta prácticas peligrosas como el ‘bonesmashing’ (golpearse la cara) o usar hormonas sin supervisión médica. Refuerza la idea de que los hombres valen según una jerarquía de ‘alfas’ y ‘betas’.",
+"fuente": "Video de clase: BBC Mundo, Los 'mesías' de la machosfera"
+},
+{
+"id": 72,
+"nivel": 3,
+"tema": "Machosfera",
+"pregunta": "El ideal del ‘hombre alfa’ o ‘sigma’ que promueve la machosfera (dominante, frío, sin mostrar emociones, que manda sobre las mujeres) corresponde al concepto de…",
+"opciones": [
+"Corresponsabilidad",
+"Nuevas masculinidades",
+"Androginia",
+"Masculinidad hegemónica"
+],
+"c": 3,
+"explicacion": "La masculinidad hegemónica es el modelo dominante de ‘ser hombre’ que se impone sobre las mujeres y sobre otros hombres. Las nuevas masculinidades lo cuestionan y proponen hombres que cuidan, sienten y comparten el poder.",
+"fuente": "Psicología y Mente: Perspectiva de género"
 }
 ];
 
@@ -1332,16 +1428,16 @@ const store = { get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse
 
 /* La "escala sexual": cada escalón tiene nombre y puntos (los mismos puntos en las tres escaleras) */
 const ESCALA = [
-  ["👀","Contacto visual",10],["😏","Sonrisa coqueta",20],["📱","“¿Qué haces?”",30],["☕","Primera cita",50],
-  ["🤝","De la manita",100],["💋","Primer beso",200],["🔥","Faje intenso",300],["💬","“¿Qué somos?”",500],
-  ["👪","Conocer suegros",800],["✅","Consentimiento",1000],["🛡️","Con condón",1500],["⚗️","Química total",2500],
+  ["👀","Contacto visual",10],["😏","Sonrisa coqueta",20],["🌙","Mensajito nocturno",30],["🌮","Cita en los tacos",50],
+  ["🤝","De la manita",100],["💋","Primer beso",200],["🍿","Faje en el cine",300],["💬","“¿Qué somos?”",500],
+  ["👵","Conocer a la suegra",800],["🛡️","Con condón, siempre",1000],["🛏️","Se quedó a dormir",1500],["⚗️","Química total",2500],
   ["🎆","Clímax académico",4000],["📖","Kamasutra nivel PhD",6000],["👑","SEXPERTO",10000],
 ];
 const mkEsc=(idx,seguros,nivel)=>({pasos:idx.map(i=>ESCALA[i]), premios:idx.map(i=>ESCALA[i][2]), seguros, nivel});
 const ESCALERAS = {
   15:mkEsc([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],[5,10],i=> i<=5?1:i<=10?2:3),
-  10:mkEsc([0,3,4,5,6,8,9,11,13,14],[3,7],i=> i<=3?1:i<=7?2:3),
-  7: mkEsc([1,4,5,6,9,12,14],[2,5],i=> i<=2?1:i<=5?2:3),
+  10:mkEsc([0,3,4,6,7,8,9,11,13,14],[3,7],i=> i<=3?1:i<=7?2:3),
+  7: mkEsc([1,4,6,7,9,12,14],[2,5],i=> i<=2?1:i<=5?2:3),
 };
 const paso = n => { const p=S.esc.pasos[n-1]; return p[0]+" "+p[1]; };
 const NIVEL_TXT = {1:"Fácil",2:"Intermedia",3:"Difícil"};
@@ -1525,11 +1621,17 @@ function revolver(q){
   ultimaC=c;
   return {...q, opciones:perm.map(i=>q.opciones[i]), c};
 }
+function animarEntrada(){
+  const q=$("#qText"), o=$("#opts"), r=document.querySelector(".rung.cur");
+  [q,o].forEach(x=>{ x.classList.remove("enter"); void x.offsetWidth; x.classList.add("enter"); });
+  if(r) r.classList.add("sube");
+  clearTimeout(animarEntrada.t); animarEntrada.t=setTimeout(()=>{q.classList.remove("enter");o.classList.remove("enter");},1300);
+}
 function siguientePregunta(excluir){
   const e=equipo();
   S.q=revolver(elegirPregunta(S.esc.nivel(e.nivel), excluir));
   S.sel=null; S.bloq=false; S.ocultas=[]; S.fase="normal"; S.ladron=null;
-  pintarJuego();
+  pintarJuego(); animarEntrada();
   iniciarTimer();
   Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); Music.duck(false);
 }
@@ -1666,7 +1768,12 @@ function resultado(ok,robo){
 
 function finTurno(motivo){
   const e=equipo(); e.estado="terminado"; e.motivo=motivo; pararTimer(); cerrarDock(); Music.stop();
-  if(motivo==="llegó a SEXPERTO 👑"){ sfx.win(); confeti(350); }
+  if(motivo==="llegó a SEXPERTO 👑"){
+    S.campeon=S.turno;
+    S.equipos.forEach(x=>{ if(x.estado==="pendiente"){ x.estado="sin turno"; x.motivo="el juego terminó: ya hay SEXPERTOS"; } });
+    sfx.win(); confeti(450); setTimeout(()=>confeti(300),1300); setTimeout(()=>confeti(300),2600);
+    pintarTabla(true); return;
+  }
   pintarTabla();
 }
 
@@ -1766,18 +1873,21 @@ function pintarTabla(forzarFin){
     $("#btnSiguiente").textContent="Turno de "+S.equipos[sig].nombre;
   }else{
     $("#btnSiguiente").classList.add("hidden");
-    const top=orden.filter(e=>e.pos===1);
-    $("#tablaSub").innerHTML = total(top[0])===0 ? "Nadie pasó de la friendzone esta vez. ¡Revancha!" :
+    const top=orden.filter(e=>e.pos===1), camp=S.campeon!=null?S.equipos[S.campeon]:null;
+    $("#sTabla .trophy").textContent = camp ? "👑" : "🏆";
+    $("#sTabla .trophy").classList.toggle("crown",!!camp);
+    $("#tablaSub").innerHTML = camp ? `👑 ¡<b style="color:var(--gold)">${esc(camp.nombre)}</b> llegó a SEXPERTO y gana el juego! Pasen por su premio 🎁` :
+      total(top[0])===0 ? "Nadie pasó de la friendzone esta vez. ¡Revancha!" :
       top.length>1 ? `¡Empate entre <b style="color:var(--gold)">${top.map(e=>esc(e.nombre)).join(" y ")}</b>! Hagan una pregunta de desempate 🎁`
                    : `¡Felicidades, <b style="color:var(--gold)">${esc(top[0].nombre)}</b>! Pasen por su premio 🎁`;
     sfx.win(); confeti(300);
   }
 }
 $("#btnSiguiente").onclick=()=>{ S.turno=S.equipos.findIndex(e=>e.estado==="pendiente"); anunciarTurno(); };
-$("#btnReiniciar").onclick=()=>{ Music.stop(); S=null; initInicio(); mostrar("#sInicio"); };
+$("#btnReiniciar").onclick=()=>{ Music.stop(); S=null; $("#sTabla .trophy").textContent="🏆"; $("#sTabla .trophy").classList.remove("crown"); initInicio(); mostrar("#sInicio"); };
 
 /* ================= modal / varios ================= */
-function modal(html){ $("#modal").innerHTML=html; $("#overlay").classList.remove("hidden"); }
+function modal(html){ const m=$("#modal"); m.innerHTML=html; m.style.animation="none"; void m.offsetWidth; m.style.animation=""; $("#overlay").classList.remove("hidden"); }
 function cerrarModal(){ $("#overlay").classList.add("hidden"); }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function pintaMute(){ $("#btnMute").textContent=sonido?"🔊":"🔇"; $("#btnMute").classList.toggle("off",!sonido); }

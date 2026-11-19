@@ -83,7 +83,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   font-size:clamp(22px,2.4vw,34px);font-weight:600;line-height:1.3;
   background:linear-gradient(180deg,#1f1570,#0c0838);border:3px solid var(--optb);
   clip-path:polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%)}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;overflow-x:clip}
 .opt{position:relative;display:flex;align-items:center;gap:14px;text-align:left;min-height:78px;padding:12px 46px;
   font-size:clamp(17px,1.65vw,24px);line-height:1.25;background:linear-gradient(180deg,#1b1366,#0b0736);border:0;
   clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);transition:filter .15s,background .2s}
@@ -120,6 +120,42 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rung.cur{background:linear-gradient(90deg,#ffb44a,var(--sel));color:#1d0c00}
 .rung.cur .n{color:#1d0c00}
 .lad-h{order:99;text-align:center;color:var(--muted);font-size:14px;margin-bottom:4px}
+
+/* ---------- animaciones ---------- */
+.screen:not(.hidden){animation:fadeIn .45s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.qbox.enter{animation:qIn .55s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes qIn{from{opacity:0;transform:scale(.8) translateY(-16px)}}
+.opts.enter .opt:not(.ok):not(.bad):not(.sel){animation-name:optInL;animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.9,.3,1.15);animation-fill-mode:both}
+.opts.enter .opt:nth-child(even):not(.ok):not(.bad):not(.sel){animation-name:optInR}
+.opts.enter .opt:nth-child(1){animation-delay:.3s}.opts.enter .opt:nth-child(2){animation-delay:.42s}
+.opts.enter .opt:nth-child(3){animation-delay:.54s}.opts.enter .opt:nth-child(4){animation-delay:.66s}
+@keyframes optInL{from{opacity:0;transform:translateX(-60px)}}
+@keyframes optInR{from{opacity:0;transform:translateX(60px)}}
+.opt.sel{animation:selGlow .8s ease-in-out infinite alternate}
+@keyframes selGlow{to{filter:brightness(1.3)}}
+.opt.bad{animation:shake .5s}
+.opt:not(:disabled):active{transform:scale(.97)}
+.rung.cur{animation:glow 1.3s ease-in-out infinite alternate}
+.rung.cur.sube{animation:rungIn .7s cubic-bezier(.2,.9,.3,1.4),glow 1.3s .7s ease-in-out infinite alternate}
+@keyframes rungIn{0%{transform:translateY(26px) scale(.7);opacity:.2}100%{transform:none;opacity:1}}
+@keyframes glow{from{box-shadow:0 0 4px rgba(255,180,74,.4)}to{box-shadow:0 0 22px rgba(255,180,74,.95)}}
+.lifebtn{transition:transform .15s}
+.lifebtn:not(.used):hover{transform:scale(1.08)}
+#overlay:not(.hidden) .modal{animation:modalIn .45s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes modalIn{from{opacity:0;transform:scale(.7) translateY(40px)}}
+.modal .verdict{animation:verdictIn .6s cubic-bezier(.2,.9,.3,1.5) both}
+@keyframes verdictIn{0%{transform:scale(2.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.rank{animation:rankIn .5s cubic-bezier(.2,.9,.3,1.2) both}
+.rank:nth-child(2){animation-delay:.12s}.rank:nth-child(3){animation-delay:.24s}.rank:nth-child(4){animation-delay:.36s}
+.rank:nth-child(5){animation-delay:.48s}.rank:nth-child(6){animation-delay:.6s}.rank:nth-child(n+7){animation-delay:.72s}
+@keyframes rankIn{from{opacity:0;transform:translateY(40px) scale(.95)}}
+.rank.p1{box-shadow:0 0 0 2px var(--gold),0 0 30px rgba(246,196,69,.35)}
+.trophy{display:inline-block;animation:flota 1.6s ease-in-out infinite alternate}
+.trophy.crown{animation:corona 1s cubic-bezier(.2,.9,.3,1.4) both,flota 1.6s 1s ease-in-out infinite alternate;filter:drop-shadow(0 0 24px rgba(246,196,69,.8))}
+@keyframes flota{to{transform:translateY(-10px) rotate(-5deg) scale(1.06)}}
+@keyframes corona{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important}}
 
 /* ---------- modales ---------- */
 .overlay{position:fixed;inset:0;background:rgba(3,1,20,.78);display:grid;place-items:center;z-index:20;padding:16px}
@@ -311,16 +347,16 @@ const store = { get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse
 
 /* La "escala sexual": cada escalón tiene nombre y puntos (los mismos puntos en las tres escaleras) */
 const ESCALA = [
-  ["👀","Contacto visual",10],["😏","Sonrisa coqueta",20],["📱","“¿Qué haces?”",30],["☕","Primera cita",50],
-  ["🤝","De la manita",100],["💋","Primer beso",200],["🔥","Faje intenso",300],["💬","“¿Qué somos?”",500],
-  ["👪","Conocer suegros",800],["✅","Consentimiento",1000],["🛡️","Con condón",1500],["⚗️","Química total",2500],
+  ["👀","Contacto visual",10],["😏","Sonrisa coqueta",20],["🌙","Mensajito nocturno",30],["🌮","Cita en los tacos",50],
+  ["🤝","De la manita",100],["💋","Primer beso",200],["🍿","Faje en el cine",300],["💬","“¿Qué somos?”",500],
+  ["👵","Conocer a la suegra",800],["🛡️","Con condón, siempre",1000],["🛏️","Se quedó a dormir",1500],["⚗️","Química total",2500],
   ["🎆","Clímax académico",4000],["📖","Kamasutra nivel PhD",6000],["👑","SEXPERTO",10000],
 ];
 const mkEsc=(idx,seguros,nivel)=>({pasos:idx.map(i=>ESCALA[i]), premios:idx.map(i=>ESCALA[i][2]), seguros, nivel});
 const ESCALERAS = {
   15:mkEsc([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],[5,10],i=> i<=5?1:i<=10?2:3),
-  10:mkEsc([0,3,4,5,6,8,9,11,13,14],[3,7],i=> i<=3?1:i<=7?2:3),
-  7: mkEsc([1,4,5,6,9,12,14],[2,5],i=> i<=2?1:i<=5?2:3),
+  10:mkEsc([0,3,4,6,7,8,9,11,13,14],[3,7],i=> i<=3?1:i<=7?2:3),
+  7: mkEsc([1,4,6,7,9,12,14],[2,5],i=> i<=2?1:i<=5?2:3),
 };
 const paso = n => { const p=S.esc.pasos[n-1]; return p[0]+" "+p[1]; };
 const NIVEL_TXT = {1:"Fácil",2:"Intermedia",3:"Difícil"};
@@ -504,11 +540,17 @@ function revolver(q){
   ultimaC=c;
   return {...q, opciones:perm.map(i=>q.opciones[i]), c};
 }
+function animarEntrada(){
+  const q=$("#qText"), o=$("#opts"), r=document.querySelector(".rung.cur");
+  [q,o].forEach(x=>{ x.classList.remove("enter"); void x.offsetWidth; x.classList.add("enter"); });
+  if(r) r.classList.add("sube");
+  clearTimeout(animarEntrada.t); animarEntrada.t=setTimeout(()=>{q.classList.remove("enter");o.classList.remove("enter");},1300);
+}
 function siguientePregunta(excluir){
   const e=equipo();
   S.q=revolver(elegirPregunta(S.esc.nivel(e.nivel), excluir));
   S.sel=null; S.bloq=false; S.ocultas=[]; S.fase="normal"; S.ladron=null;
-  pintarJuego();
+  pintarJuego(); animarEntrada();
   iniciarTimer();
   Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); Music.duck(false);
 }
@@ -645,7 +687,12 @@ function resultado(ok,robo){
 
 function finTurno(motivo){
   const e=equipo(); e.estado="terminado"; e.motivo=motivo; pararTimer(); cerrarDock(); Music.stop();
-  if(motivo==="llegó a SEXPERTO 👑"){ sfx.win(); confeti(350); }
+  if(motivo==="llegó a SEXPERTO 👑"){
+    S.campeon=S.turno;
+    S.equipos.forEach(x=>{ if(x.estado==="pendiente"){ x.estado="sin turno"; x.motivo="el juego terminó: ya hay SEXPERTOS"; } });
+    sfx.win(); confeti(450); setTimeout(()=>confeti(300),1300); setTimeout(()=>confeti(300),2600);
+    pintarTabla(true); return;
+  }
   pintarTabla();
 }
 
@@ -745,18 +792,21 @@ function pintarTabla(forzarFin){
     $("#btnSiguiente").textContent="Turno de "+S.equipos[sig].nombre;
   }else{
     $("#btnSiguiente").classList.add("hidden");
-    const top=orden.filter(e=>e.pos===1);
-    $("#tablaSub").innerHTML = total(top[0])===0 ? "Nadie pasó de la friendzone esta vez. ¡Revancha!" :
+    const top=orden.filter(e=>e.pos===1), camp=S.campeon!=null?S.equipos[S.campeon]:null;
+    $("#sTabla .trophy").textContent = camp ? "👑" : "🏆";
+    $("#sTabla .trophy").classList.toggle("crown",!!camp);
+    $("#tablaSub").innerHTML = camp ? `👑 ¡<b style="color:var(--gold)">${esc(camp.nombre)}</b> llegó a SEXPERTO y gana el juego! Pasen por su premio 🎁` :
+      total(top[0])===0 ? "Nadie pasó de la friendzone esta vez. ¡Revancha!" :
       top.length>1 ? `¡Empate entre <b style="color:var(--gold)">${top.map(e=>esc(e.nombre)).join(" y ")}</b>! Hagan una pregunta de desempate 🎁`
                    : `¡Felicidades, <b style="color:var(--gold)">${esc(top[0].nombre)}</b>! Pasen por su premio 🎁`;
     sfx.win(); confeti(300);
   }
 }
 $("#btnSiguiente").onclick=()=>{ S.turno=S.equipos.findIndex(e=>e.estado==="pendiente"); anunciarTurno(); };
-$("#btnReiniciar").onclick=()=>{ Music.stop(); S=null; initInicio(); mostrar("#sInicio"); };
+$("#btnReiniciar").onclick=()=>{ Music.stop(); S=null; $("#sTabla .trophy").textContent="🏆"; $("#sTabla .trophy").classList.remove("crown"); initInicio(); mostrar("#sInicio"); };
 
 /* ================= modal / varios ================= */
-function modal(html){ $("#modal").innerHTML=html; $("#overlay").classList.remove("hidden"); }
+function modal(html){ const m=$("#modal"); m.innerHTML=html; m.style.animation="none"; void m.offsetWidth; m.style.animation=""; $("#overlay").classList.remove("hidden"); }
 function cerrarModal(){ $("#overlay").classList.add("hidden"); }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function pintaMute(){ $("#btnMute").textContent=sonido?"🔊":"🔇"; $("#btnMute").classList.toggle("off",!sonido); }
