@@ -20,7 +20,11 @@ Un juego de repaso con el formato de *¿Quién quiere ser millonario?* para el t
 4. Cada equipo tiene estos comodines: 50:50, llamada a alguien de otro equipo, ayuda del público (el grupo vota a mano alzada) y cambio de pregunta.
 5. Al terminar aparece la tabla de posiciones y se le da su premio al equipo que gane.
 
-Atajos de teclado para el moderador: las teclas **A** a **D** eligen una opción, **Enter** confirma y **M** silencia el sonido.
+Los comodines de llamada y público se abren en un panel al lado de la pregunta para que las opciones sigan visibles. En celular el panel aparece arriba de la pregunta.
+
+El juego tiene **música de fondo original**, generada por el navegador. Se intensifica con la dificultad: en las preguntas fáciles es tranquila, en las intermedias se agregan ritmo y arpegios, y en las difíciles se vuelve más rápida y con percusión. También acelera un poco en cada escalón. Durante la revelación de la respuesta la música baja de volumen.
+
+Atajos de teclado para el moderador: las teclas **A** a **D** eligen una opción, **Enter** confirma la última palabra, **Esc** la cancela, **M** silencia los efectos y **N** apaga o prende la música.
 
 ## Cómo editar las preguntas
 

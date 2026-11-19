@@ -61,8 +61,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .foot{color:var(--muted);font-size:13px;margin-top:14px}
 
 /* ---------- juego ---------- */
-.game{display:grid;grid-template-columns:1fr 300px;gap:22px;max-width:1500px;margin:0 auto;min-height:calc(100vh - 48px)}
-.main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.game{display:grid;grid-template-columns:1fr 300px;grid-template-areas:"main side";gap:22px;max-width:1500px;margin:0 auto;min-height:calc(100vh - 48px)}
+.main{grid-area:main;display:flex;flex-direction:column;gap:16px;min-width:0}
 .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .teamtag{background:var(--panel);border:1px solid var(--gold);border-radius:999px;padding:8px 18px;font-size:20px;font-weight:700}
 .teamtag small{color:var(--muted);font-weight:400}
@@ -100,7 +100,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes blink{from{filter:brightness(1)}to{filter:brightness(1.6)}}
 .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding-bottom:6px}
 
-.ladder{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column-reverse;gap:3px;align-self:start;position:sticky;top:20px}
+.ladder{grid-area:side;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column-reverse;gap:3px;align-self:start;position:sticky;top:20px}
+.dock{grid-area:side;align-self:start;position:sticky;top:20px;background:linear-gradient(180deg,#22176f,#0d0940);border:2px solid var(--gold);border-radius:18px;padding:16px;text-align:center;box-shadow:0 0 40px rgba(246,196,69,.2)}
+.dock h3{margin:0 0 6px;font-size:22px;color:var(--gold2)}
+.dock p{margin:6px 0;font-size:16px;line-height:1.35}
+.dock .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.dock .bigclock{font-size:72px}
+.dock .bars{height:200px;gap:8px;margin:10px 0 4px}
+.dock .bar{width:58px}
+.dock .bar .ctr button{width:26px}
+.game.docked .ladder{display:none}
+.confirm{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:var(--panel);border:2px solid var(--sel);border-radius:16px;padding:12px 18px;font-size:clamp(18px,1.7vw,24px)}
+.confirm b{color:var(--gold)}
 .rung{display:flex;justify-content:space-between;padding:5px 14px;border-radius:999px;font-size:18px;font-weight:600;color:#e9a83a}
 .rung .n{color:var(--muted);width:30px}
 .rung.safe{color:#fff}
@@ -119,7 +130,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .modal .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 .modal .verdict{font-size:clamp(34px,4vw,56px);font-weight:900;margin:0}
 .verdict.ok{color:#6dffae}.verdict.bad{color:#ff8a90}
-.answer{display:inline-block;background:rgba(31,191,107,.18);border:1px solid var(--ok);border-radius:12px;padding:8px 14px;margin:6px 0;font-weight:700}
+.answer{display:inline-block;font-size:clamp(17px,1.6vw,22px);background:rgba(31,191,107,.18);border:1px solid var(--ok);border-radius:12px;padding:8px 14px;margin:6px 0;font-weight:700}
 .bars{display:flex;gap:18px;justify-content:center;align-items:flex-end;height:260px;margin:18px 0 6px}
 .bar{display:flex;flex-direction:column;align-items:center;gap:6px;width:80px}
 .bar .col{width:100%;background:linear-gradient(180deg,var(--gold2),#d9921a);border-radius:8px 8px 0 0;transition:height .4s;min-height:2px}
@@ -140,12 +151,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .logo .trophy{font-size:80px;text-align:center;margin:0}
 
 .corner{position:fixed;right:14px;bottom:12px;display:flex;gap:8px;z-index:10}
-.corner button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;color:var(--muted)}
+.corner button{background:var(--panel);border:1px solid var(--line);border-radius:10px;width:44px;height:40px;font-size:18px;color:var(--muted)}
+.corner button.off{opacity:.45}
 
 @media (max-width:900px){
   .setup{grid-template-columns:1fr}
-  .game{grid-template-columns:1fr}
+  .game{grid-template-columns:1fr;grid-template-areas:"dock" "main" "side"}
   .ladder{position:static;flex-direction:column-reverse;max-height:none}
+  .dock{grid-area:dock;position:static}
+  .game.docked .ladder{display:flex}
+  .corner{position:static;justify-content:center;padding:0 0 18px}
+  .topbar{justify-content:center}
+  .lifebtn{width:66px;height:46px;font-size:14px}
   .opts{grid-template-columns:1fr}
   .qbox{padding:20px 34px}
   .opt{padding:12px 34px}
@@ -190,6 +207,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
       <label class="chk"><input type="checkbox" id="optCambio" checked> Incluir 4º comodín: “Cambio de pregunta”</label>
       <label class="chk"><input type="checkbox" id="optSonido" checked> Efectos de sonido</label>
+      <label class="chk"><input type="checkbox" id="optMusica" checked> Música de fondo (se intensifica con la dificultad)</label>
       <div class="center" style="margin-top:14px"><button class="btn gold big" id="start">¡Comenzar!</button></div>
       <p class="foot" id="bankInfo"></p>
     </div>
@@ -208,7 +226,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <li>Después de cada respuesta se lee la <b>explicación</b> para repasar el tema.</li>
         <li>Al final gana el equipo con <b>más dinero</b> acumulado. ¡Hay premio!</li>
       </ol>
-      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia.</p>
+      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música.</p>
     </div>
   </div>
 </section>
@@ -227,12 +245,14 @@ button{font:inherit;color:inherit;cursor:pointer}
         <div class="meta"><span id="qTema"></span><span id="qNivel"></span></div>
         <div class="qbox" id="qText"></div>
         <div class="opts" id="opts"></div>
-        <div class="actions">
+        <div class="confirm hidden" id="confirmBar"><span id="confirmTxt"></span><button class="btn gold" id="cSi">Sí, última palabra</button><button class="btn" id="cNo">No, cambiar</button></div>
+        <div class="actions" id="actions">
           <button class="btn" id="btnPlantarse">Plantarse</button>
           <button class="btn ghost" id="btnTerminar">Terminar juego</button>
         </div>
       </div>
     </div>
+    <aside class="dock hidden" id="dock"></aside>
     <aside class="ladder" id="ladder"></aside>
   </div>
 </section>
@@ -248,7 +268,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 </section>
 
 <div class="overlay hidden" id="overlay"><div class="modal" id="modal"></div></div>
-<div class="corner"><button id="btnMute">🔊 Sonido</button><button id="btnFull">⛶ Pantalla completa</button></div>
+<div class="corner"><button id="btnMusic" title="Música (N)">🎵</button><button id="btnMute" title="Efectos de sonido (M)">🔊</button><button id="btnFull" title="Pantalla completa">⛶</button></div>
 
 <script>
 /* =========================================================
@@ -293,6 +313,77 @@ const sfx = {
   win(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.3,"triangle",.14,i*.14));},
 };
 
+
+/* ================= música de fondo (generada, original) =================
+   Progresión La menor – Fa – Do – Mi. Intensidad 1 (fácil): pad suave y bajo lento.
+   Intensidad 2 (intermedia): bajo en corcheas, arpegio y bombo suave.
+   Intensidad 3 (difícil): más rápido, bajo en semicorcheas, arpegio agudo, bombo y platillo.
+   El tempo también sube un poco con cada escalón de la escalera. */
+let musica=true;
+const Music = {
+  playing:false, lvl:1, frac:0, step:0, next:0, timer:null, master:null, filt:null, noiseBuf:null,
+  CH:[[45,48,52],[41,45,48],[48,52,55],[40,44,47]],
+  ac(){ AC = AC || new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; },
+  start(){
+    if(!musica||this.playing) return;
+    try{
+      const ac=this.ac(); this.playing=true;
+      this.master=ac.createGain(); this.master.gain.value=0.0001;
+      this.filt=ac.createBiquadFilter(); this.filt.type="lowpass"; this.filt.frequency.value=2400;
+      this.filt.connect(this.master).connect(ac.destination);
+      this.master.gain.setTargetAtTime(this.vol(),ac.currentTime,.6);
+      if(!this.noiseBuf){ const b=ac.createBuffer(1,ac.sampleRate*.2,ac.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.noiseBuf=b; }
+      this.step=0; this.next=ac.currentTime+.1;
+      this.timer=setInterval(()=>this.sched(),40);
+    }catch(e){ this.playing=false; }
+  },
+  stop(){
+    if(!this.playing) return; this.playing=false; clearInterval(this.timer);
+    const m=this.master; try{ m.gain.cancelScheduledValues(AC.currentTime); m.gain.setTargetAtTime(0.0001,AC.currentTime,.25); }catch(e){}
+    setTimeout(()=>{try{m.disconnect()}catch(e){}},1500);
+  },
+  vol(){ return [0,.9,1.1,1.3][this.lvl]; },
+  set(lvl,rung,largo){ this.lvl=lvl; this.frac=(rung-1)/Math.max(1,largo-1);
+    if(this.playing){ this.master.gain.setTargetAtTime(this.vol(),AC.currentTime,.4); this.filt.frequency.setTargetAtTime([0,1600,2600,4200][lvl],AC.currentTime,.5); } },
+  duck(on){ if(!this.playing) return; this.master.gain.setTargetAtTime(on?this.vol()*.15:this.vol(),AC.currentTime,.25); },
+  sched(){
+    const bpm=[0,76,98,126][this.lvl]+this.frac*14, s16=60/bpm/4;
+    while(this.next < AC.currentTime+.2){ this.play(this.step,this.next,s16); this.step=(this.step+1)%64; this.next+=s16; }
+  },
+  hz(m){ return 440*Math.pow(2,(m-69)/12); },
+  note(m,t,dur,type,vol,att=.01){
+    const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=this.hz(m);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+att); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(this.filt); o.start(t); o.stop(t+dur+.05);
+  },
+  kick(t,vol){ const o=AC.createOscillator(), g=AC.createGain(); o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(40,t+.15);
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.2); o.connect(g).connect(this.master); o.start(t); o.stop(t+.25); },
+  hat(t,vol){ const n=AC.createBufferSource(), f=AC.createBiquadFilter(), g=AC.createGain(); n.buffer=this.noiseBuf; f.type="highpass"; f.frequency.value=7000;
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.05); n.connect(f).connect(g).connect(this.master); n.start(t); n.stop(t+.06); },
+  play(st,t,s16){
+    const L=this.lvl, b=st%16, ch=this.CH[Math.floor(st/16)], bar=s16*16;
+    if(b===0) ch.forEach(m=>this.note(m+12,t,bar*.98,"triangle",L===3?.035:.045,.25));            // pad
+    if(L===3 && b===0) this.note(ch[2]+24,t,bar*.98,"sine",.02,.4);
+    if(L===1 && (b===0||b===8)) this.note(ch[0],t,s16*7,"sine",.14);                                // bajo lento
+    if(L===2 && b%2===0) this.note(ch[0]+(b%8===6?12:0),t,s16*1.6,"triangle",.11);                 // bajo corcheas
+    if(L===3) this.note(ch[0]+(b%4===2?12:0),t,s16*.9,"sawtooth",.05);                              // bajo semicorcheas
+    if(L===2 && b%2===0) this.note(ch[(b/2)%3]+24,t,s16*1.5,"triangle",.035);                       // arpegio
+    if(L===3){ const arp=[0,1,2,1]; this.note(ch[arp[b%4]]+(b%8<4?24:36),t,s16*1.2,"triangle",.03); }
+    if(L===1 && b===12) this.note(ch[1]+24,t,s16*4,"sine",.025);
+    if(L===2 && (b===0||b===8)) this.kick(t,.22);
+    if(L===3 && b%4===0) this.kick(t,.3);
+    if(L===2 && b%8===4) this.hat(t,.03);
+    if(L===3 && b%2===1) this.hat(t,b%4===3?.05:.025);
+  },
+};
+function pintaMusica(){ $("#btnMusic").classList.toggle("off",!musica); $("#btnMusic").title=musica?"Apagar música (N)":"Prender música (N)"; }
+function toggleMusica(){
+  musica=!musica; pintaMusica();
+  if(!musica) Music.stop();
+  else if(S && !$("#sJuego").classList.contains("hidden")){ const e=equipo(); Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); }
+}
+$("#btnMusic").onclick=toggleMusica;
+
 /* ================= estado ================= */
 let S = null;          // estado del juego
 let usadas = new Set(store.get("mds_usadas",[]));
@@ -331,7 +422,7 @@ $("#presenta").oninput=e=>{$("#creditos").textContent=e.target.value?("Presentan
 $("#start").onclick=()=>{
   S=nuevoEstado();
   store.set("mds_equipos",S.equipos.map(e=>e.nombre)); store.set("mds_presenta",$("#presenta").value);
-  sonido=$("#optSonido").checked; pintaMute();
+  sonido=$("#optSonido").checked; pintaMute(); musica=$("#optMusica").checked; pintaMusica();
   anunciarTurno();
 };
 
@@ -365,6 +456,7 @@ function siguientePregunta(excluir){
   S.sel=null; S.bloq=false; S.ocultas=[];
   pintarJuego();
   iniciarTimer();
+  Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); Music.duck(false);
 }
 
 /* ================= render del juego ================= */
@@ -401,20 +493,26 @@ function pintarJuego(){
   });
   $("#btnPlantarse").textContent = e.nivel>1 ? `Plantarse con ${fmt(S.esc.premios[e.nivel-2])}` : "Plantarse";
   $("#btnPlantarse").disabled = e.nivel===1;
+  marcarSel();
 }
 
 function seleccionar(i){
   if(S.bloq || S.ocultas.includes(i)) return;
   S.sel=i; sfx.pick();
-  document.querySelectorAll(".opt").forEach(b=>b.classList.toggle("sel",+b.dataset.i===i));
-  modal(`<h2>¿Es su última palabra?</h2><p>Eligieron la opción <b style="color:var(--gold)">${LET[i]}</b>: ${esc(S.q.opciones[i])}</p>
-    <div class="row"><button class="btn gold big" id="si">Sí, última palabra</button><button class="btn big" id="no">No, cambiar</button></div>`);
-  $("#si").onclick=()=>{cerrarModal();revelar();};
-  $("#no").onclick=()=>{cerrarModal();S.sel=null;document.querySelectorAll(".opt").forEach(b=>b.classList.remove("sel"));};
+  marcarSel();
 }
+function marcarSel(){
+  document.querySelectorAll(".opt").forEach(b=>b.classList.toggle("sel",+b.dataset.i===S.sel));
+  const on=S.sel!==null && S.sel>=0 && !S.bloq;
+  $("#confirmBar").classList.toggle("hidden",!on); $("#actions").classList.toggle("hidden",on);
+  if(on) $("#confirmTxt").innerHTML=`¿Es su última palabra? <b>${LET[S.sel]}</b>`;
+}
+$("#cSi").onclick=()=>{ if(S&&S.sel!==null&&!S.bloq) revelar(); };
+$("#cNo").onclick=()=>{ if(!S||S.bloq) return; S.sel=null; marcarSel(); };
 
 function revelar(){
-  S.bloq=true; pararTimer(); sfx.suspense();
+  S.bloq=true; pararTimer(); cerrarDock(); marcarSel(); Music.duck(true); sfx.suspense();
+  document.querySelector(`.opt[data-i="${S.sel}"]`).classList.add("sel");
   document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
   setTimeout(()=>{
     const ok=S.sel===S.q.c, e=equipo();
@@ -432,7 +530,7 @@ function resultado(ok){
   if(ok){
     e.dinero=premio;
     const fin=e.nivel===S.largo;
-    modal(`<p class="verdict ok">¡Correcto!</p><p class="money">${fmt(premio)}</p>${exp}
+    modal(`<p class="verdict ok">¡Correcto!</p><p class="money">${fmt(premio)}</p><div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div>${exp}
       <div class="row"><button class="btn gold big" id="cont">${fin?"¡Ver premio final!":"Siguiente pregunta"}</button></div>`);
     $("#cont").onclick=()=>{cerrarModal(); if(fin){finTurno("ganó el millón");} else {e.nivel++;siguientePregunta();}};
   }else{
@@ -446,13 +544,13 @@ function resultado(ok){
 }
 
 function finTurno(motivo){
-  const e=equipo(); e.estado="terminado"; e.motivo=motivo; pararTimer();
+  const e=equipo(); e.estado="terminado"; e.motivo=motivo; pararTimer(); cerrarDock(); Music.stop();
   if(motivo==="ganó el millón") sfx.win();
   pintarTabla();
 }
 
 $("#btnPlantarse").onclick=()=>{
-  const e=equipo(); if(S.bloq||e.nivel===1) return;
+  const e=equipo(); if(S.bloq||e.nivel===1) return; cerrarDock();
   const lleva=S.esc.premios[e.nivel-2];
   modal(`<h2>¿Se plantan?</h2><p>Se llevarían <b style="color:var(--gold)">${fmt(lleva)}</b> y terminaría su turno.</p>
     <div class="row"><button class="btn gold big" id="si">Sí, nos plantamos</button><button class="btn big" id="no">Seguir jugando</button></div>`);
@@ -467,7 +565,7 @@ $("#btnPlantarse").onclick=()=>{
 $("#btnTerminar").onclick=()=>{
   modal(`<h2>¿Terminar el juego?</h2><p>Se mostrará la tabla final con lo acumulado hasta ahora.</p>
    <div class="row"><button class="btn gold big" id="si">Sí, terminar</button><button class="btn big" id="no">Cancelar</button></div>`);
-  $("#si").onclick=()=>{cerrarModal();pararTimer();const e=equipo();if(e.estado==="jugando"){e.estado="terminado";e.motivo="juego terminado";}S.equipos.forEach(x=>{if(x.estado==="pendiente")x.estado="no jugó"});pintarTabla(true);};
+  $("#si").onclick=()=>{cerrarModal();pararTimer();cerrarDock();Music.stop();const e=equipo();if(e.estado==="jugando"){e.estado="terminado";e.motivo="juego terminado";}S.equipos.forEach(x=>{if(x.estado==="pendiente")x.estado="no jugó"});pintarTabla(true);};
   $("#no").onclick=cerrarModal;
 };
 
@@ -478,40 +576,44 @@ function usarComodin(k){
   const q=S.q;
   if(k==="50"){
     const malas=shuffle([0,1,2,3].filter(i=>i!==q.c&&!S.ocultas.includes(i))).slice(0,2);
-    S.ocultas.push(...malas); if(malas.includes(S.sel)) S.sel=null;
+    cerrarDock(); S.ocultas.push(...malas); if(malas.includes(S.sel)) S.sel=null; reanudarTimer();
     pintarJuego();
   }
   if(k==="llamada"){
     pausarTimer();
     let t=30;
-    modal(`<h2>📞 Llamada a un amigo</h2><p>Elijan a <b>una persona de otro equipo</b>. Tiene 30 segundos para ayudarles.</p>
-      <div class="bigclock" id="clk">30</div><div class="row"><button class="btn gold big" id="iniciar">Iniciar llamada</button><button class="btn big" id="colgar">Colgar</button></div>`);
-    let id=null;
-    $("#iniciar").onclick=()=>{ $("#iniciar").disabled=true; id=setInterval(()=>{t--; $("#clk").textContent=t; if(t<=5)sfx.tick(); if(t<=0){clearInterval(id);sfx.bad();$("#clk").textContent="¡Tiempo!";}},1000); };
-    $("#colgar").onclick=()=>{clearInterval(id);cerrarModal();reanudarTimer();pintarJuego();};
+    abrirDock(`<h3>📞 Llamada a un amigo</h3><p>Elijan a <b>una persona de otro equipo</b>. Tiene 30 segundos para ayudarles.</p>
+      <div class="bigclock" id="clk">30</div><div class="row"><button class="btn gold" id="iniciar">Iniciar llamada</button><button class="btn" id="colgar">Colgar</button></div>`);
+    $("#iniciar").onclick=()=>{ $("#iniciar").disabled=true; llamadaId=setInterval(()=>{t--; $("#clk").textContent=t; if(t<=5&&t>0)sfx.tick(); if(t<=0){clearInterval(llamadaId);sfx.bad();$("#clk").textContent="¡Tiempo!";}},1000); };
+    $("#colgar").onclick=()=>{cerrarDock();reanudarTimer();};
   }
   if(k==="publico"){
     pausarTimer();
     const v=[0,0,0,0];
     const vis=[0,1,2,3].filter(i=>!S.ocultas.includes(i));
-    modal(`<h2>👥 Ayuda del público</h2><p>Que todo el grupo vote levantando la mano. El moderador suma los votos de cada opción.</p>
+    abrirDock(`<h3>👥 Ayuda del público</h3><p>Todo el grupo vota levantando la mano; el moderador suma los votos.</p>
       <div class="bars">${vis.map(i=>`<div class="bar"><span class="pct" id="p${i}">0%</span><div class="col" id="c${i}" style="height:2px"></div><span class="lb">${LET[i]}</span>
       <div class="ctr"><button data-i="${i}" data-d="-1">−</button><button data-i="${i}" data-d="1">+</button></div><small id="n${i}">0 votos</small></div>`).join("")}</div>
-      <div class="row"><button class="btn gold big" id="listo">Listo</button></div>`);
-    document.querySelectorAll(".ctr button").forEach(b=>b.onclick=()=>{
+      <div class="row"><button class="btn gold" id="listo">Listo</button></div>`);
+    document.querySelectorAll("#dock .ctr button").forEach(b=>b.onclick=()=>{
       const i=+b.dataset.i; v[i]=Math.max(0,v[i]+(+b.dataset.d)); sfx.tick();
       const tot=v.reduce((a,b)=>a+b,0)||1;
-      vis.forEach(j=>{const p=Math.round(v[j]*100/tot);$("#p"+j).textContent=p+"%";$("#c"+j).style.height=Math.max(2,p*1.8)+"px";$("#n"+j).textContent=v[j]+" votos";});
+      vis.forEach(j=>{const p=Math.round(v[j]*100/tot);$("#p"+j).textContent=p+"%";$("#c"+j).style.height=Math.max(2,p*1.4)+"px";$("#n"+j).textContent=v[j]+" votos";});
     });
-    $("#listo").onclick=()=>{cerrarModal();reanudarTimer();pintarJuego();};
+    $("#listo").onclick=()=>{cerrarDock();reanudarTimer();};
   }
   if(k==="cambio"){
-    pararTimer();
+    pararTimer(); cerrarDock();
     modal(`<h2>🔄 Cambio de pregunta</h2><p>La pregunta anterior era:</p><p><i>${esc(q.pregunta)}</i></p>
       <div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div><div class="row"><button class="btn gold big" id="cont">Nueva pregunta</button></div>`);
     $("#cont").onclick=()=>{cerrarModal();siguientePregunta(q.id);};
   }
 }
+
+/* ================= panel lateral de comodines ================= */
+let llamadaId=null;
+function abrirDock(html){ cerrarDock(); $("#dock").innerHTML=html; $("#dock").classList.remove("hidden"); document.querySelector(".game").classList.add("docked"); }
+function cerrarDock(){ clearInterval(llamadaId); $("#dock").classList.add("hidden"); $("#dock").innerHTML=""; document.querySelector(".game").classList.remove("docked"); }
 
 /* ================= temporizador ================= */
 let restante=0;
@@ -524,7 +626,7 @@ function tiempoFuera(){
   modal(`<h2>⏰ ¡Se acabó el tiempo!</h2><p>Si ya tienen respuesta, elíjanla ahora. Si no, el moderador puede dar por perdida la pregunta.</p>
    <div class="row"><button class="btn big" id="seguir">Dejarles responder</button><button class="btn gold big" id="perder">Dar por perdida</button></div>`);
   $("#seguir").onclick=cerrarModal;
-  $("#perder").onclick=()=>{cerrarModal();S.bloq=true;S.sel=-1;
+  $("#perder").onclick=()=>{cerrarModal();cerrarDock();S.bloq=true;S.sel=-1;marcarSel();Music.duck(true);
     const bOk=document.querySelector(`.opt[data-i="${S.q.c}"]`); bOk.classList.add("ok"); setTimeout(()=>resultado(false),1200);};
 }
 
@@ -548,13 +650,13 @@ function pintarTabla(forzarFin){
   }
 }
 $("#btnSiguiente").onclick=()=>{ S.turno=S.equipos.findIndex(e=>e.estado==="pendiente"); anunciarTurno(); };
-$("#btnReiniciar").onclick=()=>{ S=null; initInicio(); mostrar("#sInicio"); };
+$("#btnReiniciar").onclick=()=>{ Music.stop(); S=null; initInicio(); mostrar("#sInicio"); };
 
 /* ================= modal / varios ================= */
 function modal(html){ $("#modal").innerHTML=html; $("#overlay").classList.remove("hidden"); }
 function cerrarModal(){ $("#overlay").classList.add("hidden"); }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function pintaMute(){ $("#btnMute").textContent=sonido?"🔊 Sonido":"🔇 Silencio"; }
+function pintaMute(){ $("#btnMute").textContent=sonido?"🔊":"🔇"; $("#btnMute").classList.toggle("off",!sonido); }
 $("#btnMute").onclick=()=>{sonido=!sonido;pintaMute();};
 $("#btnFull").onclick=()=>{ try{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen(); }catch(e){} };
 document.addEventListener("keydown",ev=>{
@@ -563,7 +665,12 @@ document.addEventListener("keydown",ev=>{
   if(k==="M"){sonido=!sonido;pintaMute();return;}
   const ov=!$("#overlay").classList.contains("hidden");
   if(ov && k==="ENTER"){ const b=$("#modal .btn.gold"); if(b&&!b.disabled){ev.preventDefault();b.click();} return; }
-  if(!ov && S && !$("#sJuego").classList.contains("hidden")){ const i=LET.indexOf(k); if(i>=0) seleccionar(i); }
+  if(k==="N"){toggleMusica();return;}
+  if(!ov && S && !$("#sJuego").classList.contains("hidden")){
+    if(k==="ENTER" && !$("#confirmBar").classList.contains("hidden")){ev.preventDefault();$("#cSi").click();return;}
+    if(k==="ESCAPE" && !$("#confirmBar").classList.contains("hidden")){$("#cNo").click();return;}
+    const i=LET.indexOf(k); if(i>=0) seleccionar(i);
+  }
 });
 
 initInicio();
