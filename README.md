@@ -27,6 +27,8 @@ Para que no se repitan patrones, **las opciones se revuelven cada vez que sale u
 
 El juego tiene **música de fondo original estilo EDM de cuenta regresiva**, en tres pistas que se repiten sin cortes: en las preguntas fáciles suena una intro tranquila (120 BPM), en las intermedias entra el bombo y las palmas (128 BPM) y en las difíciles viene el drop con melodía, redobles y platillos (138 BPM). Al cambiar de dificultad hace un fundido, y durante la revelación de la respuesta baja de volumen. Las pistas se generan con `herramientas/musica.py` y `build.py` las mete dentro de `index.html`.
 
+**Mesa de sonidos 🎛️:** con el botón 🎛️ de la esquina (o la tecla **S**) se abre una mesa con 10 efectos para darle ambiente: 👏 aplausos, 🎉 ovación, 😮 “uuuh”, 🥁 ba-dum-tss, 🎺 fail (trombón triste), ❌ error, 📯 bocina, 💥 boom, 🪘 redoble con platillo y 🦗 grillos. Las teclas **1** a **0** los tocan aunque la mesa esté cerrada. Son sonidos originales generados con `herramientas/sonidos.py`, así que funcionan sin internet.
+
 Atajos de teclado para el moderador: las teclas **A** a **D** eligen una opción, **Enter** confirma la última palabra, **Esc** la cancela, **M** silencia los efectos y **N** apaga o prende la música.
 
 ## Cómo editar las preguntas

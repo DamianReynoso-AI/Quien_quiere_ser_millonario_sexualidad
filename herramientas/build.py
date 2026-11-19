@@ -24,6 +24,12 @@ if not all(os.path.exists(f"musica/nivel{n}.wav") for n in (1, 2, 3)):
     subprocess.run([sys.executable, "musica.py"], check=True)
 mus = {n: base64.b64encode(open(f"musica/nivel{n}.wav", "rb").read()).decode() for n in (1, 2, 3)}
 out = out.replace("/*__MUSICA__*/{}", json.dumps({str(k): v for k, v in mus.items()}))
+# mesa de sonidos: efectos de herramientas/sonidos/ (se generan con sonidos.py si no existen)
+from sonidos import SONIDOS as _SFX
+if not all(os.path.exists(f"sonidos/{k}.wav") for k in _SFX):
+    subprocess.run([sys.executable, "sonidos.py"], check=True)
+sfx = {k: base64.b64encode(open(f"sonidos/{k}.wav", "rb").read()).decode() for k in _SFX}
+out = out.replace("/*__SONIDOS__*/{}", json.dumps(sfx))
 open("../index.html", "w", encoding="utf-8").write(out)
 
 # ---------- guía PDF (HTML para imprimir) ----------

@@ -210,6 +210,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 .corner{position:fixed;right:14px;bottom:12px;display:flex;gap:8px;z-index:10}
 .corner button{background:var(--panel);border:1px solid var(--line);border-radius:10px;width:44px;height:40px;font-size:18px;color:var(--muted)}
 .corner button.off{opacity:.45}
+.corner button.on{border-color:var(--gold);color:var(--gold)}
+.mesa{position:fixed;right:14px;bottom:60px;width:300px;z-index:10;background:rgba(18,12,64,.94);border:1px solid var(--gold);border-radius:14px;padding:8px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:mesaIn .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes mesaIn{from{opacity:0;transform:translateY(20px) scale(.95)}}
+.mesa-h{font-size:13px;font-weight:700;color:var(--gold2);margin:0 2px 6px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.mesa-h small{color:var(--muted);font-weight:400;font-size:11px}
+.mesa-g{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.sbtn{position:relative;height:52px;border-radius:10px;border:1px solid var(--optb);background:radial-gradient(circle at 50% 30%,#3b2c9e,#140c4a);font-size:22px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s}
+.sbtn small{font-size:9px;color:var(--muted);font-weight:600;white-space:nowrap}
+.sbtn kbd{position:absolute;top:2px;left:4px;font-size:9px;color:var(--gold);font-family:inherit}
+.sbtn:hover{transform:scale(1.07)}
+.sbtn.dale{animation:dale .35s}
+@keyframes dale{40%{transform:scale(1.2);background:var(--gold)}}
+.flota-emo{position:fixed;font-size:64px;pointer-events:none;z-index:30;animation:subeEmo 1.6s ease-out forwards}
+@keyframes subeEmo{0%{opacity:0;transform:translateY(0) scale(.4)}15%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-260px) scale(1) rotate(-15deg)}}
 
 @media (max-width:900px){
   .setup{grid-template-columns:1fr}
@@ -218,6 +232,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   .dock{grid-area:dock;position:static}
   .game.docked .ladder{display:flex}
   .corner{position:static;justify-content:center;padding:0 0 18px}
+  .mesa{position:static;margin:0 auto 10px;width:auto;max-width:420px}
   .topbar{justify-content:center}
   .lifebtn{width:66px;height:46px;font-size:14px}
   .opts{grid-template-columns:1fr}
@@ -285,7 +300,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <li><b>¡Robo!</b> Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla y ganar un bono (la mitad de los puntos de esa pregunta).</li>
         <li>Al final gana el equipo con <b>más puntos</b> (escala + bonos de robo). ¡Hay premio!</li>
       </ol>
-      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música.</p>
+      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música. 🎛️ <b>Mesa de sonidos:</b> S la abre y las teclas 1–0 tocan aplausos, ovación, “uuuh”, ba-dum-tss, fail, error, bocina, boom, redoble y grillos.</p>
     </div>
   </div>
 </section>
@@ -329,7 +344,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <canvas id="confetti"></canvas>
 <div class="overlay hidden" id="overlay"><div class="modal" id="modal"></div></div>
-<div class="corner"><button id="btnMusic" title="Música (N)">🎵</button><button id="btnMute" title="Efectos de sonido (M)">🔊</button><button id="btnFull" title="Pantalla completa">⛶</button></div>
+<div class="mesa hidden" id="mesa"><div class="mesa-h">🎛️ Mesa de sonidos <small>teclas 1–0 · S abre/cierra</small></div><div class="mesa-g" id="mesaG"></div></div>
+<div class="corner"><button id="btnMesa" title="Mesa de sonidos (S)">🎛️</button><button id="btnMusic" title="Música (N)">🎵</button><button id="btnMute" title="Efectos de sonido (M)">🔊</button><button id="btnFull" title="Pantalla completa">⛶</button></div>
 
 <script>
 /* =========================================================
@@ -438,6 +454,42 @@ function toggleMusica(){
   else if(S && !$("#sJuego").classList.contains("hidden")){ const e=equipo(); Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); }
 }
 $("#btnMusic").onclick=toggleMusica;
+
+/* ================= mesa de sonidos =================
+   Efectos originales sintetizados con herramientas/sonidos.py (incrustados al final del archivo).
+   Suenan aunque los efectos automáticos estén silenciados, porque los dispara el moderador. */
+const MESA=[
+  ["aplausos","👏","Aplausos",1],["ovacion","🎉","Ovación",1],["oooh","😮","Uuuuh",.9],["badum","🥁","Ba-dum-tss",1.1],["trombon","🎺","Fail",.5],
+  ["buzzer","❌","Error",.32],["bocina","📯","Bocina",.38],["boom","💥","Boom",.7],["redoble","🪘","Redoble",1.1],["grillos","🦗","Grillos",.9],
+];
+const Mesa={
+  buf:{}, listo:null,
+  cargar(){
+    if(this.listo) return this.listo;
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const datos=window.SONIDOS||{};
+    this.listo=Promise.all(MESA.map(([k])=>new Promise(res=>{
+      if(!datos[k]) return res();
+      const bin=atob(datos[k]), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+      try{ AC.decodeAudioData(u.buffer,x=>{this.buf[k]=x;res();},()=>res()); }catch(e){res();}
+    })));
+    return this.listo;
+  },
+  tocar(n){
+    const d=MESA[n]; if(!d) return;
+    try{ this.cargar(); if(AC.state==="suspended") AC.resume(); }catch(e){ return; }
+    this.listo.then(()=>{ const b=this.buf[d[0]]; if(!b) return;
+      const s=AC.createBufferSource(), g=AC.createGain(); s.buffer=b; g.gain.value=d[3]; s.connect(g).connect(AC.destination); s.start(); });
+    const btn=document.querySelector(`.sbtn[data-n="${n}"]`); if(btn){ btn.classList.remove("dale"); void btn.offsetWidth; btn.classList.add("dale"); }
+    const e=document.createElement("div"); e.className="flota-emo"; e.textContent=d[1];
+    e.style.right=(20+Math.random()*240)+"px"; e.style.bottom=(90+Math.random()*60)+"px";
+    document.body.appendChild(e); setTimeout(()=>e.remove(),1700);
+  },
+};
+$("#mesaG").innerHTML=MESA.map(([k,ic,lb],n)=>`<button class="sbtn" data-n="${n}" title="${lb} (tecla ${(n+1)%10})"><kbd>${(n+1)%10}</kbd>${ic}<small>${lb}</small></button>`).join("");
+document.querySelectorAll(".sbtn").forEach(b=>b.onclick=()=>Mesa.tocar(+b.dataset.n));
+function toggleMesa(){ const m=$("#mesa"); m.classList.toggle("hidden"); $("#btnMesa").classList.toggle("on",!m.classList.contains("hidden")); if(!m.classList.contains("hidden")) try{Mesa.cargar();}catch(e){} }
+$("#btnMesa").onclick=toggleMesa;
 
 /* ================= estado ================= */
 let S = null;          // estado del juego
@@ -819,6 +871,8 @@ document.addEventListener("keydown",ev=>{
   const ov=!$("#overlay").classList.contains("hidden");
   if(ov && k==="ENTER"){ const b=$("#modal .btn.gold"); if(b&&!b.disabled){ev.preventDefault();b.click();} return; }
   if(k==="N"){toggleMusica();return;}
+  if(k==="S"){toggleMesa();return;}
+  if(/^[0-9]$/.test(ev.key)){ Mesa.tocar((+ev.key+9)%10); return; }
   if(!ov && S && !$("#sJuego").classList.contains("hidden")){
     if(k==="ENTER" && !$("#confirmBar").classList.contains("hidden")){ev.preventDefault();$("#cSi").click();return;}
     if(k==="ESCAPE" && !$("#confirmBar").classList.contains("hidden")){$("#cNo").click();return;}
@@ -830,5 +884,7 @@ initInicio();
 </script>
 <script>/* pistas de música (WAV en base64, generadas por herramientas/musica.py) */
 var MUSICA=/*__MUSICA__*/{};</script>
+<script>/* efectos de la mesa de sonidos (WAV en base64, generados por herramientas/sonidos.py) */
+var SONIDOS=/*__SONIDOS__*/{};</script>
 </body>
 </html>
