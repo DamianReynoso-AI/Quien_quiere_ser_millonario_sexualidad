@@ -215,9 +215,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes mesaIn{from{opacity:0;transform:translateY(20px) scale(.95)}}
 .mesa-h{font-size:13px;font-weight:700;color:var(--gold2);margin:0 2px 6px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
 .mesa-h small{color:var(--muted);font-weight:400;font-size:11px}
-.mesa-g{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
-.sbtn{position:relative;height:52px;border-radius:10px;border:1px solid var(--optb);background:radial-gradient(circle at 50% 30%,#3b2c9e,#140c4a);font-size:22px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s}
-.sbtn small{font-size:9px;color:var(--muted);font-weight:600;white-space:nowrap}
+.mesa-g{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.sbtn{position:relative;height:44px;padding:0;border-radius:10px;border:1px solid var(--optb);background:radial-gradient(circle at 50% 30%,#3b2c9e,#140c4a);font-size:19px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s}
+.sbtn small{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;max-width:100%;color:var(--muted);font-weight:600;white-space:nowrap}
 .sbtn kbd{position:absolute;top:2px;left:4px;font-size:9px;color:var(--gold);font-family:inherit}
 .sbtn:hover{transform:scale(1.07)}
 .sbtn.dale{animation:dale .35s}
@@ -300,7 +300,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <li><b>¡Robo!</b> Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla y ganar un bono (la mitad de los puntos de esa pregunta).</li>
         <li>Al final gana el equipo con <b>más puntos</b> (escala + bonos de robo). ¡Hay premio!</li>
       </ol>
-      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música. 🎛️ <b>Mesa de sonidos:</b> S la abre y las teclas 1–0 tocan aplausos, ovación, “uuuh”, ba-dum-tss, fail, error, bocina, boom, redoble y grillos.</p>
+      <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música. 🎛️ <b>Mesa de sonidos:</b> S la abre y las teclas 1–0, Q y W tocan pedo, bocina de payaso, fail, wah wah, bonk, abucheo, risa malvada, boing, boom, grillos, ba-dum-tss y aplausos. ¡Para rostear!</p>
     </div>
   </div>
 </section>
@@ -344,7 +344,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <canvas id="confetti"></canvas>
 <div class="overlay hidden" id="overlay"><div class="modal" id="modal"></div></div>
-<div class="mesa hidden" id="mesa"><div class="mesa-h">🎛️ Mesa de sonidos <small>teclas 1–0 · S abre/cierra</small></div><div class="mesa-g" id="mesaG"></div></div>
+<div class="mesa hidden" id="mesa"><div class="mesa-h">🎛️ Mesa de sonidos <small>1–0, Q, W · S</small></div><div class="mesa-g" id="mesaG"></div></div>
 <div class="corner"><button id="btnMesa" title="Mesa de sonidos (S)">🎛️</button><button id="btnMusic" title="Música (N)">🎵</button><button id="btnMute" title="Efectos de sonido (M)">🔊</button><button id="btnFull" title="Pantalla completa">⛶</button></div>
 
 <script>
@@ -459,9 +459,10 @@ $("#btnMusic").onclick=toggleMusica;
    Efectos originales sintetizados con herramientas/sonidos.py (incrustados al final del archivo).
    Suenan aunque los efectos automáticos estén silenciados, porque los dispara el moderador. */
 const MESA=[
-  ["aplausos","👏","Aplausos",1],["ovacion","🎉","Ovación",1],["oooh","😮","Uuuuh",.9],["badum","🥁","Ba-dum-tss",1.1],["trombon","🎺","Fail",.5],
-  ["buzzer","❌","Error",.32],["bocina","📯","Bocina",.38],["boom","💥","Boom",.7],["redoble","🪘","Redoble",1.1],["grillos","🦗","Grillos",.9],
+  ["pedo","💩","Pedo",.55],["payaso","🤡","Payaso",.3],["silbato","📉","Fail",.42],["trombon","🎺","Wah wah",.5],["bonk","🔨","Bonk",1],["abucheo","👎","Buuu",1],
+  ["risa","😈","Muajaja",1.1],["boing","🤸","Boing",.7],["boom","💥","Boom",.7],["grillos","🦗","Grillos",.9],["badum","🥁","Ba-dum",1.1],["aplausos","👏","Aplausos",1],
 ];
+const TECLA_MESA=["1","2","3","4","5","6","7","8","9","0","Q","W"];
 const Mesa={
   buf:{}, listo:null,
   cargar(){
@@ -486,7 +487,7 @@ const Mesa={
     document.body.appendChild(e); setTimeout(()=>e.remove(),1700);
   },
 };
-$("#mesaG").innerHTML=MESA.map(([k,ic,lb],n)=>`<button class="sbtn" data-n="${n}" title="${lb} (tecla ${(n+1)%10})"><kbd>${(n+1)%10}</kbd>${ic}<small>${lb}</small></button>`).join("");
+$("#mesaG").innerHTML=MESA.map(([k,ic,lb],n)=>`<button class="sbtn" data-n="${n}" title="${lb} (tecla ${TECLA_MESA[n]})"><kbd>${TECLA_MESA[n]}</kbd>${ic}<small>${lb}</small></button>`).join("");
 document.querySelectorAll(".sbtn").forEach(b=>b.onclick=()=>Mesa.tocar(+b.dataset.n));
 function toggleMesa(){ const m=$("#mesa"); m.classList.toggle("hidden"); $("#btnMesa").classList.toggle("on",!m.classList.contains("hidden")); if(!m.classList.contains("hidden")) try{Mesa.cargar();}catch(e){} }
 $("#btnMesa").onclick=toggleMesa;
@@ -872,7 +873,7 @@ document.addEventListener("keydown",ev=>{
   if(ov && k==="ENTER"){ const b=$("#modal .btn.gold"); if(b&&!b.disabled){ev.preventDefault();b.click();} return; }
   if(k==="N"){toggleMusica();return;}
   if(k==="S"){toggleMesa();return;}
-  if(/^[0-9]$/.test(ev.key)){ Mesa.tocar((+ev.key+9)%10); return; }
+  { const t=TECLA_MESA.indexOf(k); if(t>=0){ Mesa.tocar(t); return; } }
   if(!ov && S && !$("#sJuego").classList.contains("hidden")){
     if(k==="ENTER" && !$("#confirmBar").classList.contains("hidden")){ev.preventDefault();$("#cSi").click();return;}
     if(k==="ESCAPE" && !$("#confirmBar").classList.contains("hidden")){$("#cNo").click();return;}

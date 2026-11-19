@@ -163,9 +163,79 @@ def badum():
     return reverb(out, mix=.15)
 
 
+def pedo():
+    d = 1.15; n = int(d * SR); out = np.zeros(n + SR // 4); t0 = 0.0
+    while t0 < d:
+        k = t0 / d
+        f = 75 + 25 * np.sin(2 * np.pi * 2.3 * t0) + 40 * k ** 3 + rng.uniform(-12, 12)
+        t = T(0.05); r = 160 + 140 * k + rng.uniform(-20, 20)
+        p_ = np.sin(2 * np.pi * r * t) * np.exp(-t * 90) + np.sin(2 * np.pi * r * 2.7 * t) * np.exp(-t * 160) * .4
+        a = np.sin(np.pi * min(1, k * 1.15)) ** .4 * rng.uniform(.6, 1)
+        i = int(t0 * SR); out[i:i + len(p_)] += p_ * a
+        t0 += 1 / f
+    nz = filt(rng.standard_normal(len(out)), lo=150, hi=900) * .08
+    y = np.tanh(filt(out + nz * np.abs(out), hi=1100) * 3)
+    return reverb(y, secs=.4, mix=.08)
+
+
+def payaso():
+    out = []
+    for f0, d in ((520, .22), (440, .32)):
+        t = T(d); f = f0 * (1 + .25 * np.exp(-t * 25)) * (1 - .06 * t / d)
+        y = np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)) + .5 * saw(f * 2.01, t)
+        y = band(y, 1400, 1.6) + band(y, 2800, 2) * .5
+        y = np.tanh(y * 4) * np.minimum(1, t / .01) * np.minimum(1, (d - t) / .03)
+        out += [y, np.zeros(int(.08 * SR))]
+    return np.concatenate(out)
+
+
+def silbato():
+    d = 1.1; t = T(d)
+    f = 1900 * (300 / 1900) ** ((t / d) ** 1.3) * (1 + .015 * np.sin(2 * np.pi * 7 * t))
+    y = np.sin(2 * np.pi * np.cumsum(f) / SR) + filt(rng.standard_normal(len(t)), lo=1000, hi=4000) * .05
+    y *= np.minimum(1, t / .03) * np.minimum(1, (d - t) / .05)
+    t2 = T(.35); thud = np.sin(2 * np.pi * np.cumsum(90 + 60 * np.exp(-t2 * 20)) / SR) * np.exp(-t2 * 12)
+    return np.concatenate([y, np.zeros(int(.05 * SR)), thud * 1.2])
+
+
+def bonk():
+    t = T(.5)
+    y = (np.sin(2 * np.pi * np.cumsum(330 * (1 + .5 * np.exp(-t * 60))) / SR) * np.exp(-t * 14)
+         + np.sin(2 * np.pi * 870 * t) * np.exp(-t * 30) * .5
+         + filt(rng.standard_normal(len(t)), lo=800, hi=4000) * np.exp(-t * 120) * .6)
+    return reverb(np.tanh(y * 1.5), secs=.6, mix=.15)
+
+
+def abucheo():
+    d = 2.8
+    v = voces(rng.uniform(95, 190, 18), d, [(320, 1), (700, .5), (2300, .05)],
+              glide=lambda t: -0.12 * (t / d))
+    env = np.minimum(1, T(d) / .25) * np.exp(-np.maximum(0, T(d) - 2.0) * 2.5)
+    return reverb(v * env, mix=.35)
+
+
+def risa():
+    sil = [(.5, 1.0, 600)] + [(.17, .82 - i * .06, 800) for i in range(6)] + [(.6, .5, 750)]
+    out = []
+    for d, rel, f1 in sil:
+        t = T(d); f0 = 125 * rel * (1 + .03 * np.sin(2 * np.pi * 6 * t)) * (1 - .1 * t / d)
+        src = saw(f0, t) + filt(rng.standard_normal(len(t)), lo=500, hi=3000) * .25 * np.exp(-t * 25)
+        y = band(src, f1, 4) + band(src, 1200, 5) * .7 + band(src, 2600, 6) * .2
+        env = np.minimum(1, t / .015) * np.exp(-t * (2 if d > .3 else 9))
+        out += [y * env, np.zeros(int(.04 * SR))]
+    return reverb(np.tanh(np.concatenate(out) * 2), secs=2.4, mix=.45)
+
+
+def boing():
+    d = 1.0; t = T(d)
+    f = 180 * (1 + .9 * t / d) * (1 + .35 * np.sin(2 * np.pi * 22 * t) * np.exp(-t * 3))
+    y = np.sin(2 * np.pi * np.cumsum(f) / SR) + .3 * np.sin(4 * np.pi * np.cumsum(f) / SR)
+    return y * np.minimum(1, t / .005) * np.exp(-t * 3.2)
+
+
 SONIDOS = {
-    "aplausos": aplausos, "ovacion": ovacion, "oooh": oooh, "badum": badum, "trombon": trombon,
-    "buzzer": buzzer, "bocina": bocina, "boom": boom, "redoble": redoble, "grillos": grillos,
+    "pedo": pedo, "payaso": payaso, "silbato": silbato, "trombon": trombon, "bonk": bonk, "abucheo": abucheo,
+    "risa": risa, "boing": boing, "boom": boom, "grillos": grillos, "badum": badum, "aplausos": aplausos,
 }
 
 
