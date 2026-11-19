@@ -65,9 +65,9 @@ li.ok{{font-weight:700;color:#0b6b37}}
 .src{{margin:2px 0 0;color:#666;font-size:8.8pt;font-style:italic}}
 table{{border-collapse:collapse;width:100%;font-size:10pt}}td,th{{border:1px solid #ccc;padding:4px 8px;text-align:left}}th{{background:#efeafc}}
 </style></head><body>
-<div class="cover"><div class="disc">$</div>
+<div class="cover"><div class="disc">?</div>
 <h1>Guía de preguntas con respuestas</h1>
-<h2>Juego “El Millón del Saber” · Afectividad y Sexualidad</h2>
+<h2>Juego “¿Quién Quiere Ser Sexperto?” · Afectividad y Sexualidad</h2>
 <p style="margin-top:14px">{len(data)} preguntas obtenidas de los materiales de clase del semestre</p>
 <div class="meta"><div><b>Equipo:</b></div><div><b>Integrantes:</b></div><div><b>Profesor(a):</b></div><div><b>Fecha:</b></div></div></div>
 

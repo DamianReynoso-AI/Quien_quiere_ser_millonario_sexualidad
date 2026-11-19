@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>El Millón del Saber</title>
+<title>Quién Quiere Ser Sexperto</title>
 <style>
 :root{
   --bg1:#0b0730; --bg2:#1c0f5c; --bg3:#3a1278;
@@ -141,6 +141,26 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bigclock{font-size:96px;font-weight:900;color:var(--gold);margin:6px 0}
 .modal .money{font-size:clamp(40px,5vw,72px);font-weight:900;color:var(--gold);margin:6px 0}
 
+/* ---------- marcador, robo, animaciones ---------- */
+.strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px;font-size:15px;color:var(--muted);transition:transform .3s}
+.av{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;font-size:17px;flex:none}
+.rank .av{width:46px;height:46px;font-size:26px}
+.chip b{color:var(--gold)}
+.chip.cur{border-color:var(--gold);color:#fff;transform:scale(1.06)}
+.chip.bump{animation:bump .6s}
+@keyframes bump{40%{transform:scale(1.25)}}
+.teamtag .av{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-right:6px;font-size:20px;vertical-align:middle}
+.bigav{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;font-size:70px;margin:6px auto;box-shadow:0 0 40px rgba(255,255,255,.25);animation:pop .6s}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.shake{animation:shake .5s}
+@keyframes shake{20%,60%{transform:translateX(-12px)}40%,80%{transform:translateX(12px)}}
+.robo-teams{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.robo-teams .btn{display:flex;align-items:center;gap:8px;justify-content:center}
+.robo-hint{font-size:20px;color:var(--gold2);font-weight:800}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+.bonus{color:#6dffae;font-size:14px}
+
 /* ---------- tabla ---------- */
 .board{max-width:900px;margin:0 auto}
 .rank{display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 20px;margin-bottom:10px;font-size:24px}
@@ -174,8 +194,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 <!-- ================= INICIO ================= -->
 <section id="sInicio" class="screen">
   <div class="logo">
-    <div class="disc"><span>$</span></div>
-    <h1>El Millón del Saber</h1>
+    <div class="disc"><span>?</span></div>
+    <h1>¿Quién Quiere Ser Sexperto?</h1>
     <p>Afectividad y Sexualidad · Juego de repaso del semestre</p>
     <p id="creditos" style="color:var(--gold2);font-size:16px"></p>
   </div>
@@ -206,6 +226,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         </select>
       </div>
       <label class="chk"><input type="checkbox" id="optCambio" checked> Incluir 4º comodín: “Cambio de pregunta”</label>
+      <label class="chk"><input type="checkbox" id="optRobo" checked> ¡Robo! Si un equipo falla, otro puede robar la pregunta y ganar un bono</label>
       <label class="chk"><input type="checkbox" id="optSonido" checked> Efectos de sonido</label>
       <label class="chk"><input type="checkbox" id="optMusica" checked> Música de fondo (se intensifica con la dificultad)</label>
       <div class="center" style="margin-top:14px"><button class="btn gold big" id="start">¡Comenzar!</button></div>
@@ -224,7 +245,8 @@ button{font:inherit;color:inherit;cursor:pointer}
           <br>• <b>Público</b>: todo el grupo vota levantando la mano y se muestra la gráfica.
           <br>• <b>Cambio</b>: cambian la pregunta por otra del mismo nivel.</li>
         <li>Después de cada respuesta se lee la <b>explicación</b> para repasar el tema.</li>
-        <li>Al final gana el equipo con <b>más dinero</b> acumulado. ¡Hay premio!</li>
+        <li><b>¡Robo!</b> Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla y ganar un bono (la mitad del valor de esa pregunta).</li>
+        <li>Al final gana el equipo con <b>más dinero</b> (escalera + bonos de robo). ¡Hay premio!</li>
       </ol>
       <p class="foot">Atajos del moderador: teclas A–D eligen, Enter confirma, M silencia los efectos, N apaga o prende la música.</p>
     </div>
@@ -235,6 +257,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 <section id="sJuego" class="screen hidden">
   <div class="game">
     <div class="main">
+      <div class="strip" id="strip"></div>
       <div class="topbar">
         <div class="teamtag" id="teamTag"></div>
         <div class="spacer"></div>
@@ -267,6 +290,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </section>
 
+<canvas id="confetti"></canvas>
 <div class="overlay hidden" id="overlay"><div class="modal" id="modal"></div></div>
 <div class="corner"><button id="btnMusic" title="Música (N)">🎵</button><button id="btnMute" title="Efectos de sonido (M)">🔊</button><button id="btnFull" title="Pantalla completa">⛶</button></div>
 
@@ -314,66 +338,103 @@ const sfx = {
 };
 
 
-/* ================= música de fondo (generada, original) =================
-   Progresión La menor – Fa – Do – Mi. Intensidad 1 (fácil): pad suave y bajo lento.
-   Intensidad 2 (intermedia): bajo en corcheas, arpegio y bombo suave.
-   Intensidad 3 (difícil): más rápido, bajo en semicorcheas, arpegio agudo, bombo y platillo.
+/* ================= música de fondo épica (generada, original) =================
+   Estilo "tráiler / cuenta regresiva": tambores graves tipo taiko, cuerdas en ostinato,
+   metales, coro sintético, reverberación y crescendos (risers) cada 4 compases.
+   Progresión La menor – Fa – Do – Sol (i–VI–III–VII).
+   Intensidad 1 (fácil): coro, cuerdas suaves y un golpe de tambor por compás.
+   Intensidad 2 (intermedia): ritmo 3-3-2 en tambores, cuerdas en corcheas, metales y riser.
+   Intensidad 3 (difícil): más rápido, cuerdas en semicorcheas, metales en golpes, redobles e impactos.
    El tempo también sube un poco con cada escalón de la escalera. */
 let musica=true;
 const Music = {
-  playing:false, lvl:1, frac:0, step:0, next:0, timer:null, master:null, filt:null, noiseBuf:null,
-  CH:[[45,48,52],[41,45,48],[48,52,55],[40,44,47]],
+  playing:false, lvl:1, frac:0, step:0, next:0, timer:null, master:null, bus:null, comp:null, noiseBuf:null, irBuf:null,
+  CH:[[57,60,64],[57,60,65],[55,60,64],[55,59,62]],   // voicings
+  ROOT:[45,41,48,43],                                     // bajos
   ac(){ AC = AC || new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; },
   start(){
     if(!musica||this.playing) return;
     try{
       const ac=this.ac(); this.playing=true;
+      if(!this.noiseBuf){ const b=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.noiseBuf=b; }
+      if(!this.irBuf){ const len=ac.sampleRate*2.8, b=ac.createBuffer(2,len,ac.sampleRate);
+        for(let c=0;c<2;c++){ const d=b.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6); } this.irBuf=b; }
       this.master=ac.createGain(); this.master.gain.value=0.0001;
-      this.filt=ac.createBiquadFilter(); this.filt.type="lowpass"; this.filt.frequency.value=2400;
-      this.filt.connect(this.master).connect(ac.destination);
-      this.master.gain.setTargetAtTime(this.vol(),ac.currentTime,.6);
-      if(!this.noiseBuf){ const b=ac.createBuffer(1,ac.sampleRate*.2,ac.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.noiseBuf=b; }
+      this.comp=ac.createDynamicsCompressor(); this.comp.threshold.value=-20; this.comp.ratio.value=8; this.comp.attack.value=.005; this.comp.release.value=.2;
+      this.bus=ac.createGain();
+      const rev=ac.createConvolver(); rev.buffer=this.irBuf; const rg=ac.createGain(); rg.gain.value=.38;
+      this.bus.connect(this.comp); this.bus.connect(rev); rev.connect(rg).connect(this.comp);
+      this.comp.connect(this.master).connect(ac.destination);
+      this.master.gain.setTargetAtTime(this.vol(),ac.currentTime,.8);
       this.step=0; this.next=ac.currentTime+.1;
       this.timer=setInterval(()=>this.sched(),40);
     }catch(e){ this.playing=false; }
   },
   stop(){
     if(!this.playing) return; this.playing=false; clearInterval(this.timer);
-    const m=this.master; try{ m.gain.cancelScheduledValues(AC.currentTime); m.gain.setTargetAtTime(0.0001,AC.currentTime,.25); }catch(e){}
-    setTimeout(()=>{try{m.disconnect()}catch(e){}},1500);
+    const m=this.master; try{ m.gain.cancelScheduledValues(AC.currentTime); m.gain.setTargetAtTime(0.0001,AC.currentTime,.35); }catch(e){}
+    setTimeout(()=>{try{m.disconnect()}catch(e){}},2000);
   },
-  vol(){ return [0,.9,1.1,1.3][this.lvl]; },
-  set(lvl,rung,largo){ this.lvl=lvl; this.frac=(rung-1)/Math.max(1,largo-1);
-    if(this.playing){ this.master.gain.setTargetAtTime(this.vol(),AC.currentTime,.4); this.filt.frequency.setTargetAtTime([0,1600,2600,4200][lvl],AC.currentTime,.5); } },
-  duck(on){ if(!this.playing) return; this.master.gain.setTargetAtTime(on?this.vol()*.15:this.vol(),AC.currentTime,.25); },
+  vol(){ return [0,.8,.75,.6][this.lvl]; },
+  set(lvl,rung,largo){ const sube=lvl>this.lvl; this.lvl=lvl; this.frac=(rung-1)/Math.max(1,largo-1);
+    if(this.playing){ this.master.gain.setTargetAtTime(this.vol(),AC.currentTime,.4); if(sube) this.impact(AC.currentTime+.05,1); } },
+  duck(on){ if(!this.playing) return; this.master.gain.setTargetAtTime(on?this.vol()*.18:this.vol(),AC.currentTime,.25); },
   sched(){
-    const bpm=[0,76,98,126][this.lvl]+this.frac*14, s16=60/bpm/4;
+    const bpm=[0,92,112,132][this.lvl]+this.frac*10, s16=60/bpm/4;
     while(this.next < AC.currentTime+.2){ this.play(this.step,this.next,s16); this.step=(this.step+1)%64; this.next+=s16; }
   },
   hz(m){ return 440*Math.pow(2,(m-69)/12); },
-  note(m,t,dur,type,vol,att=.01){
-    const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=this.hz(m);
-    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+att); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    o.connect(g).connect(this.filt); o.start(t); o.stop(t+dur+.05);
+  // voz con filtro y envolvente
+  voz(m,t,dur,{type="sawtooth",vol=.05,att=.01,rel=.1,cut=2000,det=0,dest=null}={}){
+    const o=AC.createOscillator(), f=AC.createBiquadFilter(), g=AC.createGain();
+    o.type=type; o.frequency.value=this.hz(m); o.detune.value=det;
+    f.type="lowpass"; f.frequency.value=cut; f.Q.value=.7;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+att);
+    g.gain.setValueAtTime(vol,t+Math.max(att,dur-rel)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(f).connect(g).connect(dest||this.bus); o.start(t); o.stop(t+dur+.05);
   },
-  kick(t,vol){ const o=AC.createOscillator(), g=AC.createGain(); o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(40,t+.15);
-    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.2); o.connect(g).connect(this.master); o.start(t); o.stop(t+.25); },
-  hat(t,vol){ const n=AC.createBufferSource(), f=AC.createBiquadFilter(), g=AC.createGain(); n.buffer=this.noiseBuf; f.type="highpass"; f.frequency.value=7000;
-    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.05); n.connect(f).connect(g).connect(this.master); n.start(t); n.stop(t+.06); },
+  ruido(t,dur,{tipo="bandpass",f1=1000,f2=null,q=1,vol=.2,att=.002}={}){
+    const n=AC.createBufferSource(), f=AC.createBiquadFilter(), g=AC.createGain();
+    n.buffer=this.noiseBuf; f.type=tipo; f.frequency.setValueAtTime(f1,t); if(f2) f.frequency.exponentialRampToValueAtTime(f2,t+dur); f.Q.value=q;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+att); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    n.connect(f).connect(g).connect(this.bus); n.start(t); n.stop(t+dur+.05);
+  },
+  taiko(t,vol=.7,f0=95){
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f0*.42,t+.35);
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.9);
+    o.connect(g).connect(this.bus); o.start(t); o.stop(t+1);
+    this.ruido(t,.12,{tipo:"lowpass",f1:900,vol:vol*.35});
+  },
+  snare(t,vol=.18){ this.ruido(t,.22,{tipo:"bandpass",f1:1800,q:.8,vol}); this.voz(50,t,.12,{type:"triangle",vol:vol*.5,cut:3000}); },
+  riser(t,dur){ this.ruido(t,dur,{tipo:"bandpass",f1:300,f2:7000,q:2,vol:.12,att:dur*.9}); },
+  impact(t,k=1){ this.taiko(t,.9*k,70); this.ruido(t,1.8,{tipo:"lowpass",f1:5000,f2:300,vol:.16*k}); },
   play(st,t,s16){
-    const L=this.lvl, b=st%16, ch=this.CH[Math.floor(st/16)], bar=s16*16;
-    if(b===0) ch.forEach(m=>this.note(m+12,t,bar*.98,"triangle",L===3?.035:.045,.25));            // pad
-    if(L===3 && b===0) this.note(ch[2]+24,t,bar*.98,"sine",.02,.4);
-    if(L===1 && (b===0||b===8)) this.note(ch[0],t,s16*7,"sine",.14);                                // bajo lento
-    if(L===2 && b%2===0) this.note(ch[0]+(b%8===6?12:0),t,s16*1.6,"triangle",.11);                 // bajo corcheas
-    if(L===3) this.note(ch[0]+(b%4===2?12:0),t,s16*.9,"sawtooth",.05);                              // bajo semicorcheas
-    if(L===2 && b%2===0) this.note(ch[(b/2)%3]+24,t,s16*1.5,"triangle",.035);                       // arpegio
-    if(L===3){ const arp=[0,1,2,1]; this.note(ch[arp[b%4]]+(b%8<4?24:36),t,s16*1.2,"triangle",.03); }
-    if(L===1 && b===12) this.note(ch[1]+24,t,s16*4,"sine",.025);
-    if(L===2 && (b===0||b===8)) this.kick(t,.22);
-    if(L===3 && b%4===0) this.kick(t,.3);
-    if(L===2 && b%8===4) this.hat(t,.03);
-    if(L===3 && b%2===1) this.hat(t,b%4===3?.05:.025);
+    const L=this.lvl, b=st%16, bar=Math.floor(st/16), ch=this.CH[bar], r=this.ROOT[bar], B=s16*16;
+    const p332=[0,3,6,8,11,14];
+    // coro / pad (siempre)
+    if(b===0) ch.forEach((m,i)=>{ [-9,9].forEach(d=>this.voz(m,t,B*.98,{vol:.022,att:B*.35,rel:B*.3,cut:L===1?900:1400,det:d})); });
+    // bajo sub
+    if(b===0) this.voz(r-12,t,B*.95,{type:"sine",vol:.16,att:.05,rel:.3});
+    // cuerdas en ostinato
+    const seq=[ch[0]+12,ch[1]+12,ch[2]+12,ch[1]+12];
+    if(L===1 && b%4===0) this.voz(seq[(b/4)%4],t,s16*3,{vol:.03,att:.02,cut:1800});
+    if(L===2 && b%2===0) this.voz(seq[(b/2)%4],t,s16*1.6,{vol:.035,att:.01,cut:2600,det:5});
+    if(L===3){ const acc=p332.includes(b); this.voz(seq[b%4]+(acc?0:0),t,s16*.9,{vol:acc?.05:.03,att:.005,cut:3200,det:4}); this.voz(r,t,s16*.9,{vol:.035,att:.005,cut:900}); }
+    // metales
+    if(L>=2 && b===0) ch.forEach(m=>{ this.voz(m-12,t,B*.6,{vol:.04,att:.12,rel:.3,cut:1600,det:-6}); this.voz(m-12,t,B*.6,{vol:.04,att:.12,rel:.3,cut:1600,det:6}); });
+    if(L===3 && (b===8||b===11||b===14)) ch.forEach(m=>this.voz(m-12,t,s16*1.5,{vol:.05,att:.01,rel:.08,cut:2400}));
+    // tambores
+    if(L===1 && b===0) this.taiko(t,.55);
+    if(L===1 && b===8 && bar%2===1) this.taiko(t,.35,120);
+    if(L===2 && p332.includes(b)) this.taiko(t,b===0?.7:.45,b%8===0?90:115);
+    if(L===2 && (b===4||b===12)) this.snare(t,.12);
+    if(L===3 && p332.includes(b)) this.taiko(t,b===0?.85:.55,b%8===0?85:110);
+    if(L===3 && (b===4||b===12)) this.snare(t,.2);
+    if(L===3 && bar===3 && b>=12) this.taiko(t,.3+(b-12)*.12,140+(b-12)*15);   // redoble final
+    // riser e impacto cada 4 compases
+    if(L>=2 && bar===3 && b===0) this.riser(t,B*.98);
+    if(L===3 && bar===0 && b===0 && st===0) this.impact(t,.9);
   },
 };
 function pintaMusica(){ $("#btnMusic").classList.toggle("off",!musica); $("#btnMusic").title=musica?"Apagar música (N)":"Prender música (N)"; }
@@ -386,6 +447,31 @@ $("#btnMusic").onclick=toggleMusica;
 
 /* ================= estado ================= */
 let S = null;          // estado del juego
+const AVATARES=["🦊","🐙","🦄","🐝","🐬","🦁","🐸","🦉"];
+const COLORES=["#e9572b","#8b5cf6","#ec4899","#eab308","#06b6d4","#f97316","#22c55e","#a16207"];
+const total=e=>e.dinero+(e.bonos||0);
+function avatar(e,cls="av"){ return `<span class="${cls}" style="background:${e.col}">${e.av}</span>`; }
+function pintarStrip(bumpIdx){
+  if(!S) return;
+  $("#strip").innerHTML=S.equipos.map((e,k)=>`<span class="chip${k===S.turno?" cur":""}${k===bumpIdx?" bump":""}">${avatar(e)}${esc(e.nombre)} <b>${fmt(total(e))}</b></span>`).join("");
+}
+
+/* ================= confeti ================= */
+function confeti(n=120){
+  const cv=$("#confetti"), ctx=cv.getContext("2d"); cv.width=innerWidth; cv.height=innerHeight;
+  const cols=["#f6c445","#ffdf80","#6dffae","#ff7b82","#8b9bff","#ffffff","#ec4899"];
+  const ps=Array.from({length:n},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,r:4+Math.random()*6,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[Math.floor(Math.random()*cols.length)]}));
+  const t0=performance.now();
+  (function f(t){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore();});
+    if(t-t0<3500) requestAnimationFrame(f); else ctx.clearRect(0,0,cv.width,cv.height);
+  })(t0);
+}
+function contar(el,desde,hasta,ms=900){
+  const t0=performance.now();
+  (function f(t){ const k=Math.min(1,(t-t0)/ms), v=Math.round(desde+(hasta-desde)*(1-Math.pow(1-k,3))); el.textContent=fmt(v); if(k<1) requestAnimationFrame(f); })(t0);
+}
 let usadas = new Set(store.get("mds_usadas",[]));
 let timerId = null;
 
@@ -393,7 +479,8 @@ function nuevoEstado(){
   const nombres=[...document.querySelectorAll(".teamrow input")].map((i,k)=>i.value.trim()||("Equipo "+(k+1)));
   const largo=+$("#largo").value;
   return {
-    equipos:nombres.map(n=>({nombre:n,dinero:0,estado:"pendiente",nivel:0})),
+    equipos:nombres.map((n,k)=>({nombre:n,dinero:0,bonos:0,estado:"pendiente",nivel:0,av:AVATARES[k%AVATARES.length],col:COLORES[k%COLORES.length]})),
+    robo:$("#optRobo").checked,
     turno:0, largo, esc:ESCALERAS[largo], tiempo:+$("#tiempo").value,
     conCambio:$("#optCambio").checked,
   };
@@ -433,7 +520,8 @@ function equipo(){return S.equipos[S.turno]}
 function anunciarTurno(){
   const e=equipo(); e.estado="jugando"; e.nivel=1; e.dinero=0;
   e.comodines={"50":true,"llamada":true,"publico":true,"cambio":S.conCambio};
-  modal(`<h2>Turno de</h2><p class="money" style="font-size:clamp(36px,5vw,64px)">${esc(e.nombre)}</p>
+  pintarStrip();
+  modal(`<h2>Turno de</h2>${avatar(e,"bigav")}<p class="money" style="font-size:clamp(36px,5vw,64px)">${esc(e.nombre)}</p>
     <p>Escalera de ${S.largo} preguntas · Niveles seguros: ${S.esc.seguros.map(n=>fmt(S.esc.premios[n-1])).join(" y ")}</p>
     <div class="row"><button class="btn gold big" id="go">¡A jugar!</button></div>`);
   $("#go").onclick=()=>{cerrarModal();mostrar("#sJuego");siguientePregunta();};
@@ -453,7 +541,7 @@ function elegirPregunta(nivel, excluir){
 function siguientePregunta(excluir){
   const e=equipo();
   S.q=elegirPregunta(S.esc.nivel(e.nivel), excluir);
-  S.sel=null; S.bloq=false; S.ocultas=[];
+  S.sel=null; S.bloq=false; S.ocultas=[]; S.fase="normal"; S.ladron=null;
   pintarJuego();
   iniciarTimer();
   Music.set(S.esc.nivel(e.nivel),e.nivel,S.largo); Music.start(); Music.duck(false);
@@ -462,7 +550,8 @@ function siguientePregunta(excluir){
 /* ================= render del juego ================= */
 function pintarJuego(){
   const e=equipo(), q=S.q;
-  $("#teamTag").innerHTML=`${esc(e.nombre)} <small>· pregunta ${e.nivel} de ${S.largo}</small>`;
+  $("#teamTag").innerHTML=`${avatar(e)}${esc(e.nombre)} <small>· pregunta ${e.nivel} de ${S.largo}</small>`;
+  pintarStrip();
   $("#qTema").textContent="Tema: "+q.tema;
   $("#qNivel").textContent="Dificultad: "+NIVEL_TXT[q.nivel]+" · por "+fmt(S.esc.premios[e.nivel-1]);
   $("#qText").textContent=q.pregunta;
@@ -497,6 +586,8 @@ function pintarJuego(){
 }
 
 function seleccionar(i){
+  if(!S) return;
+  if(S.fase==="robo"){ if(S.ladron!==null && !S.ocultas.includes(i) && i!==S.sel) robarCon(i); return; }
   if(S.bloq || S.ocultas.includes(i)) return;
   S.sel=i; sfx.pick();
   marcarSel();
@@ -516,27 +607,70 @@ function revelar(){
   document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
   setTimeout(()=>{
     const ok=S.sel===S.q.c, e=equipo();
+    const libres=[0,1,2,3].filter(i=>i!==S.sel&&!S.ocultas.includes(i));
+    if(!ok && S.robo && S.equipos.length>1 && libres.length>=2){
+      document.querySelector(`.opt[data-i="${S.sel}"]`).classList.replace("sel","bad");
+      sfx.bad(); $("#qText").classList.add("shake"); setTimeout(()=>$("#qText").classList.remove("shake"),600);
+      setTimeout(iniciarRobo,900); return;
+    }
     const bOk=document.querySelector(`.opt[data-i="${S.q.c}"]`);
     bOk.classList.remove("sel"); bOk.classList.add("ok");
-    if(!ok) document.querySelector(`.opt[data-i="${S.sel}"]`).classList.replace("sel","bad");
-    ok?sfx.ok():sfx.bad();
+    if(!ok){ document.querySelector(`.opt[data-i="${S.sel}"]`).classList.replace("sel","bad"); $("#qText").classList.add("shake"); setTimeout(()=>$("#qText").classList.remove("shake"),600); }
+    ok?(sfx.ok(),confeti(S.esc.seguros.includes(e.nivel)?180:60)):sfx.bad();
     setTimeout(()=>resultado(ok),1500);
   },2200);
 }
 
-function resultado(ok){
+/* ================= ¡Robo! ================= */
+function bonoRobo(){ return Math.round(S.esc.premios[equipo().nivel-1]/2); }
+function iniciarRobo(){
+  S.fase="robo"; Music.duck(false);
+  const otros=S.equipos.map((x,k)=>({x,k})).filter(o=>o.k!==S.turno);
+  abrirDock(`<h3>🔥 ¡Robo!</h3><p><b>${esc(equipo().nombre)}</b> falló. ¿Qué equipo quiere robar la pregunta?</p>
+    <p class="robo-hint">Bono: ${fmt(bonoRobo())}</p><p>El primer equipo en levantar la mano.</p>
+    <div class="robo-teams">${otros.map(o=>`<button class="btn" data-k="${o.k}">${avatar(o.x)}${esc(o.x.nombre)}</button>`).join("")}
+    <button class="btn ghost" id="nadie">Nadie roba</button></div>`);
+  document.querySelectorAll(".robo-teams [data-k]").forEach(b=>b.onclick=()=>{
+    S.ladron=+b.dataset.k; const l=S.equipos[S.ladron]; sfx.life();
+    abrirDock(`<h3>🔥 ¡Robo!</h3>${avatar(l,"bigav")}<p><b>${esc(l.nombre)}</b>, elijan una de las opciones que quedan.</p><p class="robo-hint">Bono: ${fmt(bonoRobo())}</p>`);
+    document.querySelectorAll(".opt").forEach(o=>{ const i=+o.dataset.i; o.disabled = S.ocultas.includes(i)||i===S.sel; });
+  });
+  $("#nadie").onclick=()=>terminarRobo(null,false);
+}
+function robarCon(i){
+  const l=S.equipos[S.ladron]; S.ladron=null; Music.duck(true);
+  document.querySelectorAll(".opt").forEach(o=>o.disabled=true);
+  document.querySelector(`.opt[data-i="${i}"]`).classList.add("sel"); sfx.suspense();
+  setTimeout(()=>{
+    const ok=i===S.q.c, b=document.querySelector(`.opt[data-i="${i}"]`);
+    if(ok){ l.bonos=(l.bonos||0)+bonoRobo(); sfx.ok(); confeti(110); }
+    else { b.classList.replace("sel","bad"); sfx.bad(); }
+    terminarRobo(l,ok);
+  },1800);
+}
+function terminarRobo(l,ok){
+  cerrarDock(); S.fase="normal";
+  const bOk=document.querySelector(`.opt[data-i="${S.q.c}"]`); bOk.classList.remove("sel"); bOk.classList.add("ok");
+  if(l) pintarStrip(S.equipos.indexOf(l));
+  setTimeout(()=>resultado(false,l?{l,ok}:null),1400);
+}
+
+function resultado(ok,robo){
   const e=equipo(), q=S.q, premio=S.esc.premios[e.nivel-1];
   const exp=`<p>${esc(q.explicacion)}</p><p class="src">Fuente: ${esc(q.fuente)}</p>`;
   if(ok){
     e.dinero=premio;
     const fin=e.nivel===S.largo;
-    modal(`<p class="verdict ok">¡Correcto!</p><p class="money">${fmt(premio)}</p><div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div>${exp}
+    const antes=e.nivel>1?S.esc.premios[e.nivel-2]:0;
+    modal(`<p class="verdict ok">¡Correcto!</p><p class="money" id="mny">${fmt(antes)}</p>${S.esc.seguros.includes(e.nivel)?'<p class="robo-hint">🔒 ¡Nivel seguro alcanzado!</p>':""}<div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div>${exp}
       <div class="row"><button class="btn gold big" id="cont">${fin?"¡Ver premio final!":"Siguiente pregunta"}</button></div>`);
+    contar($("#mny"),antes,premio); pintarStrip();
     $("#cont").onclick=()=>{cerrarModal(); if(fin){finTurno("ganó el millón");} else {e.nivel++;siguientePregunta();}};
   }else{
     const seg=[...S.esc.seguros].reverse().find(n=>n<e.nivel);
     e.dinero=seg?S.esc.premios[seg-1]:0;
-    modal(`<p class="verdict bad">Incorrecto</p><p>La respuesta correcta era:</p><div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div>${exp}
+    const rob = robo ? (robo.ok ? `<p class="robo-hint">🔥 ¡${esc(robo.l.nombre)} robó la pregunta y gana ${fmt(bonoRobo())}!</p>` : `<p>${esc(robo.l.nombre)} intentó robar, pero también falló.</p>`) : "";
+    modal(`<p class="verdict bad">Incorrecto</p>${rob}<p>La respuesta correcta era:</p><div class="answer">${LET[q.c]}: ${esc(q.opciones[q.c])}</div>${exp}
       <p>Se llevan <b style="color:var(--gold)">${fmt(e.dinero)}</b></p>
       <div class="row"><button class="btn gold big" id="cont">Continuar</button></div>`);
     $("#cont").onclick=()=>{cerrarModal();finTurno("falló en la pregunta "+e.nivel);};
@@ -545,7 +679,7 @@ function resultado(ok){
 
 function finTurno(motivo){
   const e=equipo(); e.estado="terminado"; e.motivo=motivo; pararTimer(); cerrarDock(); Music.stop();
-  if(motivo==="ganó el millón") sfx.win();
+  if(motivo==="ganó el millón"){ sfx.win(); confeti(350); }
   pintarTabla();
 }
 
@@ -634,9 +768,10 @@ function tiempoFuera(){
 function pintarTabla(forzarFin){
   mostrar("#sTabla");
   const quedan=S.equipos.some(e=>e.estado==="pendiente");
-  const orden=S.equipos.map((e,i)=>({...e,i})).sort((a,b)=>b.dinero-a.dinero);
-  $("#board").innerHTML=orden.map((e,k)=>`<div class="rank ${e.estado==="terminado"?"p"+(k+1):""}"><span class="pos">${k+1}</span>
-     <span class="nm">${esc(e.nombre)}<br><span class="st">${e.estado==="pendiente"?"por jugar":esc(e.motivo||e.estado)}</span></span><span class="mn">${fmt(e.dinero)}</span></div>`).join("");
+  const orden=S.equipos.map((e,i)=>({...e,i})).sort((a,b)=>total(b)-total(a));
+  let pos=0; orden.forEach((e,k)=>{ if(k===0||total(e)!==total(orden[k-1])) pos=k+1; e.pos=pos; });
+  $("#board").innerHTML=orden.map(e=>`<div class="rank ${e.estado!=="pendiente"&&total(e)>0?"p"+e.pos:""}"><span class="pos">${e.pos}</span>${avatar(e,"av")}
+     <span class="nm">${esc(e.nombre)}<br><span class="st">${e.estado==="pendiente"?"por jugar":esc(e.motivo||e.estado)}</span>${e.bonos?`<br><span class="bonus">incluye ${fmt(e.bonos)} de bonos por robo</span>`:""}</span><span class="mn">${fmt(total(e))}</span></div>`).join("");
   if(quedan && !forzarFin){
     $("#tablaSub").textContent="Resultados parciales";
     $("#btnSiguiente").classList.remove("hidden");
@@ -644,9 +779,11 @@ function pintarTabla(forzarFin){
     $("#btnSiguiente").textContent="Turno de "+S.equipos[sig].nombre;
   }else{
     $("#btnSiguiente").classList.add("hidden");
-    const g=orden[0];
-    $("#tablaSub").innerHTML=`¡Felicidades, <b style="color:var(--gold)">${esc(g.nombre)}</b>! Pasen por su premio 🎁`;
-    sfx.win();
+    const top=orden.filter(e=>e.pos===1);
+    $("#tablaSub").innerHTML = total(top[0])===0 ? "Nadie ganó dinero esta vez. ¡Revancha!" :
+      top.length>1 ? `¡Empate entre <b style="color:var(--gold)">${top.map(e=>esc(e.nombre)).join(" y ")}</b>! Hagan una pregunta de desempate 🎁`
+                   : `¡Felicidades, <b style="color:var(--gold)">${esc(top[0].nombre)}</b>! Pasen por su premio 🎁`;
+    sfx.win(); confeti(300);
   }
 }
 $("#btnSiguiente").onclick=()=>{ S.turno=S.equipos.findIndex(e=>e.estado==="pendiente"); anunciarTurno(); };

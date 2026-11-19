@@ -1,4 +1,4 @@
-# El Millón del Saber · Afectividad y Sexualidad
+# ¿Quién Quiere Ser Sexperto? · Afectividad y Sexualidad
 
 Un juego de repaso con el formato de *¿Quién quiere ser millonario?* para el trabajo final de la materia Afectividad y Sexualidad.
 
@@ -18,11 +18,12 @@ Un juego de repaso con el formato de *¿Quién quiere ser millonario?* para el t
 2. Elige qué tan larga es la escalera: 15 preguntas (el formato original), 10 (la recomendada para 30 a 40 minutos) o 7. Elige también el tiempo por pregunta.
 3. Los equipos pasan por turnos. Eligen una opción y el moderador confirma con “¿Es su última palabra?”. Si fallan, se quedan con el último nivel seguro. También pueden plantarse y llevarse lo que llevan.
 4. Cada equipo tiene estos comodines: 50:50, llamada a alguien de otro equipo, ayuda del público (el grupo vota a mano alzada) y cambio de pregunta.
-5. Al terminar aparece la tabla de posiciones y se le da su premio al equipo que gane.
+5. **¡Robo!** Si un equipo falla, antes de revelar la respuesta otro equipo puede intentar robarla. El primero que levante la mano elige entre las opciones que quedan y, si acierta, gana un bono de la mitad del valor de esa pregunta.
+6. Arriba siempre se ve el marcador de todos los equipos, cada uno con su avatar. Al terminar aparece la tabla de posiciones (dinero de la escalera más bonos de robo, con empates incluidos) y se le da su premio al equipo que gane.
 
 Los comodines de llamada y público se abren en un panel al lado de la pregunta para que las opciones sigan visibles. En celular el panel aparece arriba de la pregunta.
 
-El juego tiene **música de fondo original**, generada por el navegador. Se intensifica con la dificultad: en las preguntas fáciles es tranquila, en las intermedias se agregan ritmo y arpegios, y en las difíciles se vuelve más rápida y con percusión. También acelera un poco en cada escalón. Durante la revelación de la respuesta la música baja de volumen.
+El juego tiene **música de fondo épica y original**, generada por el navegador al estilo de un tráiler: tambores graves, cuerdas en ostinato, metales, coro, reverberación y crescendos. Se intensifica con la dificultad: en las preguntas fáciles es más tranquila, en las intermedias entran el ritmo de tambores y los metales, y en las difíciles se vuelve más rápida, con redobles e impactos. También acelera un poco en cada escalón. Durante la revelación de la respuesta la música baja de volumen.
 
 Atajos de teclado para el moderador: las teclas **A** a **D** eligen una opción, **Enter** confirma la última palabra, **Esc** la cancela, **M** silencia los efectos y **N** apaga o prende la música.
 
